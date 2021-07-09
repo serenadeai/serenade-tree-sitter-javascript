@@ -80,6 +80,9 @@ module.exports = grammar({
     [$.assignment_expression, $.object_assignment_pattern],
     [$.labeled_statement, $._property_name],
     [$.computed_property_name, $.array],
+    [$.object_assignment_pattern, $.assignment_variable_expression],
+    [$.assignment_variable_expression, $.pattern],
+    [$.assignment_variable_expression, $.rest_pattern],
   ],
 
   word: $ => $.identifier,
@@ -239,8 +242,10 @@ module.exports = grammar({
       $._semicolon
     ),
 
+    assignment_variable_declarator: $ => choice($.identifier, $._destructuring_pattern), 
+
     variable_declarator: $ => seq(
-      field('name', choice($.identifier, $._destructuring_pattern)),
+      field('left', $.assignment_variable_declarator), 
       optional($._initializer)
     ),
 
@@ -743,10 +748,12 @@ module.exports = grammar({
       $._destructuring_pattern
     ),
 
+    assignment_variable_expression: $ => choice($.parenthesized_expression, $._lhs_expression),
+
     assignment_expression: $ => prec.right('assign', seq(
-      field('left', choice($.parenthesized_expression, $._lhs_expression)),
+      field('left', $.assignment_variable_expression),
       '=',
-      field('right', $.expression)
+      field('assignment_value', $.expression)
     )),
 
     _augmented_assignment_lhs: $ => choice(
@@ -766,7 +773,7 @@ module.exports = grammar({
 
     _initializer: $ => seq(
       '=',
-      field('value', $.expression)
+      field('assignment_value', $.expression)
     ),
 
     _destructuring_pattern: $ => choice(
@@ -1111,9 +1118,9 @@ module.exports = grammar({
     ),
 
     pair: $ => seq(
-      field('key', $._property_name),
+      field('pair_key', $._property_name),
       ':',
-      field('value', $.expression)
+      field('pair_value', $.expression)
     ),
 
     pair_pattern: $ => seq(

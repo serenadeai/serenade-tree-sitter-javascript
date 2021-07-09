@@ -699,24 +699,28 @@
         }
       ]
     },
+    "assignment_variable_declarator": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "identifier"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_destructuring_pattern"
+        }
+      ]
+    },
     "variable_declarator": {
       "type": "SEQ",
       "members": [
         {
           "type": "FIELD",
-          "name": "name",
+          "name": "left",
           "content": {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "identifier"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_destructuring_pattern"
-              }
-            ]
+            "type": "SYMBOL",
+            "name": "assignment_variable_declarator"
           }
         },
         {
@@ -3350,6 +3354,19 @@
         }
       ]
     },
+    "assignment_variable_expression": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "parenthesized_expression"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_lhs_expression"
+        }
+      ]
+    },
     "assignment_expression": {
       "type": "PREC_RIGHT",
       "value": "assign",
@@ -3360,17 +3377,8 @@
             "type": "FIELD",
             "name": "left",
             "content": {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "SYMBOL",
-                  "name": "parenthesized_expression"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "_lhs_expression"
-                }
-              ]
+              "type": "SYMBOL",
+              "name": "assignment_variable_expression"
             }
           },
           {
@@ -3379,7 +3387,7 @@
           },
           {
             "type": "FIELD",
-            "name": "right",
+            "name": "assignment_value",
             "content": {
               "type": "SYMBOL",
               "name": "expression"
@@ -3517,7 +3525,7 @@
         },
         {
           "type": "FIELD",
-          "name": "value",
+          "name": "assignment_value",
           "content": {
             "type": "SYMBOL",
             "name": "expression"
@@ -4864,7 +4872,7 @@
               },
               {
                 "type": "PATTERN",
-                "value": "[^*]*\\*+([^\\/*][^*]*\\*+)*"
+                "value": "[^*]*\\*+([^/*][^*]*\\*+)*"
               },
               {
                 "type": "STRING",
@@ -5028,7 +5036,7 @@
               },
               {
                 "type": "PATTERN",
-                "value": "[^\\/\\\\\\[\\n]"
+                "value": "[^/\\\\\\[\\n]"
               }
             ]
           }
@@ -5551,13 +5559,13 @@
         "members": [
           {
             "type": "PATTERN",
-            "value": "[^\\x00-\\x1F\\s0-9:;`\"'@#.,|^&<=>+\\-*\\/\\\\%?!~()\\[\\]{}\\uFEFF\\u2060\\u200B\\u00A0]|\\\\u[0-9a-fA-F]{4}|\\\\u\\{[0-9a-fA-F]+\\}"
+            "value": "[^\\x00-\\x1F\\s0-9:;`\"'@#.,|^&<=>+\\-*/\\\\%?!~()\\[\\]{}\\uFEFF\\u2060\\u200B\\u00A0]|\\\\u[0-9a-fA-F]{4}|\\\\u\\{[0-9a-fA-F]+\\}"
           },
           {
             "type": "REPEAT",
             "content": {
               "type": "PATTERN",
-              "value": "[^\\x00-\\x1F\\s:;`\"'@#.,|^&<=>+\\-*\\/\\\\%?!~()\\[\\]{}\\uFEFF\\u2060\\u200B\\u00A0]|\\\\u[0-9a-fA-F]{4}|\\\\u\\{[0-9a-fA-F]+\\}"
+              "value": "[^\\x00-\\x1F\\s:;`\"'@#.,|^&<=>+\\-*/\\\\%?!~()\\[\\]{}\\uFEFF\\u2060\\u200B\\u00A0]|\\\\u[0-9a-fA-F]{4}|\\\\u\\{[0-9a-fA-F]+\\}"
             }
           }
         ]
@@ -5574,13 +5582,13 @@
           },
           {
             "type": "PATTERN",
-            "value": "[^\\x00-\\x1F\\s0-9:;`\"'@#.,|^&<=>+\\-*\\/\\\\%?!~()\\[\\]{}\\uFEFF\\u2060\\u200B\\u00A0]|\\\\u[0-9a-fA-F]{4}|\\\\u\\{[0-9a-fA-F]+\\}"
+            "value": "[^\\x00-\\x1F\\s0-9:;`\"'@#.,|^&<=>+\\-*/\\\\%?!~()\\[\\]{}\\uFEFF\\u2060\\u200B\\u00A0]|\\\\u[0-9a-fA-F]{4}|\\\\u\\{[0-9a-fA-F]+\\}"
           },
           {
             "type": "REPEAT",
             "content": {
               "type": "PATTERN",
-              "value": "[^\\x00-\\x1F\\s:;`\"'@#.,|^&<=>+\\-*\\/\\\\%?!~()\\[\\]{}\\uFEFF\\u2060\\u200B\\u00A0]|\\\\u[0-9a-fA-F]{4}|\\\\u\\{[0-9a-fA-F]+\\}"
+              "value": "[^\\x00-\\x1F\\s:;`\"'@#.,|^&<=>+\\-*/\\\\%?!~()\\[\\]{}\\uFEFF\\u2060\\u200B\\u00A0]|\\\\u[0-9a-fA-F]{4}|\\\\u\\{[0-9a-fA-F]+\\}"
             }
           }
         ]
@@ -6150,7 +6158,7 @@
       "members": [
         {
           "type": "FIELD",
-          "name": "key",
+          "name": "pair_key",
           "content": {
             "type": "SYMBOL",
             "name": "_property_name"
@@ -6162,7 +6170,7 @@
         },
         {
           "type": "FIELD",
-          "name": "value",
+          "name": "pair_value",
           "content": {
             "type": "SYMBOL",
             "name": "expression"
@@ -6353,6 +6361,18 @@
     [
       "computed_property_name",
       "array"
+    ],
+    [
+      "object_assignment_pattern",
+      "assignment_variable_expression"
+    ],
+    [
+      "assignment_variable_expression",
+      "pattern"
+    ],
+    [
+      "assignment_variable_expression",
+      "rest_pattern"
     ]
   ],
   "precedences": [
