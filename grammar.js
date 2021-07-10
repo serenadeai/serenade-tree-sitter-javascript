@@ -230,16 +230,18 @@ module.exports = grammar({
       $._semicolon
     ),
 
+    declaration_assignments: $ => seq(
+      commaSep1($.variable_declarator),
+      $._semicolon),
+
     variable_declaration: $ => seq(
       'var',
-      commaSep1($.variable_declarator),
-      $._semicolon
+      $.declaration_assignments
     ),
 
     lexical_declaration: $ => seq(
       choice('let', 'const'),
-      commaSep1($.variable_declarator),
-      $._semicolon
+      $.declaration_assignments
     ),
 
     assignment_variable_declarator: $ => choice($.identifier, $._destructuring_pattern), 
@@ -478,7 +480,7 @@ module.exports = grammar({
 
     object: $ => prec('object', seq(
       '{',
-      commaSep(optional(choice(
+      field('key_value_list', commaSep(optional(choice(
         $.pair,
         $.spread_element,
         $.method_definition,
@@ -486,7 +488,7 @@ module.exports = grammar({
           choice($.identifier, $._reserved_identifier),
           $.shorthand_property_identifier
         )
-      ))),
+      )))),
       '}'
     )),
 
@@ -541,7 +543,7 @@ module.exports = grammar({
 
     jsx_element: $ => seq(
       field('open_tag', $.jsx_opening_element),
-      repeat($._jsx_child),
+      field('jsx_html_content', repeat($._jsx_child)), 
       field('close_tag', $.jsx_closing_element)
     ),
 
@@ -551,11 +553,11 @@ module.exports = grammar({
 
     jsx_expression: $ => seq(
       '{',
-      optional(choice(
+      field('jsx_expression_body', optional(choice(
         $.expression,
         $.sequence_expression,
         $.spread_element
-      )),
+      ))),
       '}'
     ),
 
