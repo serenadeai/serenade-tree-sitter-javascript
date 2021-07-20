@@ -248,7 +248,7 @@ module.exports = grammar({
 
     variable_declarator: $ => seq(
       field('left', $.assignment_variable_declarator), 
-      optional($._initializer)
+      optional($.initializer)
     ),
 
     statement_block: $ => prec.right(seq(
@@ -773,7 +773,7 @@ module.exports = grammar({
       field('right', $.expression)
     )),
 
-    _initializer: $ => seq(
+    initializer: $ => seq(
       '=',
       field('assignment_value', $.expression)
     ),
@@ -1079,7 +1079,7 @@ module.exports = grammar({
       repeat(field('decorator', $.decorator)),
       optional('static'),
       field('property', $._property_name),
-      optional($._initializer)
+      optional($.initializer)
     ),
 
     formal_parameters: $ => seq(

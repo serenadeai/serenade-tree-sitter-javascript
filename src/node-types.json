@@ -1136,16 +1136,6 @@
     "type": "field_definition",
     "named": true,
     "fields": {
-      "assignment_value": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "expression",
-            "named": true
-          }
-        ]
-      },
       "decorator": {
         "multiple": true,
         "required": false,
@@ -1182,6 +1172,16 @@
           }
         ]
       }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "initializer",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -1607,6 +1607,22 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "initializer",
+    "named": true,
+    "fields": {
+      "assignment_value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -2086,33 +2102,28 @@
   {
     "type": "object",
     "named": true,
-    "fields": {
-      "key_value_list": {
-        "multiple": true,
-        "required": false,
-        "types": [
-          {
-            "type": ",",
-            "named": false
-          },
-          {
-            "type": "method_definition",
-            "named": true
-          },
-          {
-            "type": "pair",
-            "named": true
-          },
-          {
-            "type": "shorthand_property_identifier",
-            "named": true
-          },
-          {
-            "type": "spread_element",
-            "named": true
-          }
-        ]
-      }
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "method_definition",
+          "named": true
+        },
+        {
+          "type": "pair",
+          "named": true
+        },
+        {
+          "type": "shorthand_property_identifier",
+          "named": true
+        },
+        {
+          "type": "spread_element",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -2793,16 +2804,6 @@
     "type": "variable_declarator",
     "named": true,
     "fields": {
-      "assignment_value": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "expression",
-            "named": true
-          }
-        ]
-      },
       "left": {
         "multiple": false,
         "required": true,
@@ -2813,6 +2814,16 @@
           }
         ]
       }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "initializer",
+          "named": true
+        }
+      ]
     }
   },
   {
