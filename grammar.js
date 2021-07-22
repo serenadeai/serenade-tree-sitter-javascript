@@ -31,8 +31,8 @@ module.exports = grammar({
     $._jsx_element_name,
     $._jsx_child,
     $._jsx_element,
-    $._jsx_attribute_name,
-    $._jsx_attribute_value,
+    $.jsx_attribute_name,
+    $.jsx_attribute_value,
     $._jsx_identifier,
     $._lhs_expression,
   ],
@@ -191,7 +191,9 @@ module.exports = grammar({
 
     named_imports: $ => seq(
       '{',
-      commaSep(alias($._import_export_specifier, $.import_specifier)),
+      optional_with_placeholder('import_specifier_list',
+        commaSep1(alias($._import_export_specifier, $.import_specifier))
+      ),
       optional(','),
       '}'
     ),
@@ -253,17 +255,24 @@ module.exports = grammar({
 
     statement_block: $ => prec.right(seq(
       '{',
-      repeat($.statement),
+      optional_with_placeholder('statement_list', repeat($.statement)),
       '}',
       optional($._automatic_semicolon)
     )),
 
     else_clause: $ => seq('else', $.statement),
 
-    if_statement: $ => prec.right(seq(
-      'if',
+    // else_if_clause: $ => seq('else', 'if', $.statement),
+
+    if_clause: $ => seq('if',
       field('condition', $.parenthesized_expression),
-      field('consequence', $.statement),
+      field('consequence', $.statement)
+    ), 
+
+    if_statement: $ => prec.right(seq(
+      $.if_clause,
+
+      
       optional(field('alternative', $.else_clause))
     )),
 
@@ -286,7 +295,7 @@ module.exports = grammar({
         $.expression_statement,
         $.empty_statement
       )),
-      field('increment', optional($._expressions)),
+      optional_with_placeholder('increment', $._expressions),
       ')',
       field('body', $.statement)
     ),
@@ -480,7 +489,7 @@ module.exports = grammar({
 
     object: $ => prec('object', seq(
       '{',
-      field('key_value_list', commaSep(optional(choice(
+      optional_with_placeholder('key_value_list', commaSep1(choice(
         $.pair,
         $.spread_element,
         $.method_definition,
@@ -488,7 +497,7 @@ module.exports = grammar({
           choice($.identifier, $._reserved_identifier),
           $.shorthand_property_identifier
         )
-      )))),
+      ))),
       '}'
     )),
 
@@ -543,7 +552,7 @@ module.exports = grammar({
 
     jsx_element: $ => seq(
       field('open_tag', $.jsx_opening_element),
-      field('jsx_html_content', repeat($._jsx_child)), 
+      optional_with_placeholder('jsx_html_content', repeat($._jsx_child)), 
       field('close_tag', $.jsx_closing_element)
     ),
 
@@ -613,17 +622,17 @@ module.exports = grammar({
 
     _jsx_attribute: $ => choice($.jsx_attribute, $.jsx_expression),
 
-    _jsx_attribute_name: $ => choice(alias($._jsx_identifier, $.property_identifier), $.jsx_namespace_name),
+    jsx_attribute_name: $ => choice(alias($._jsx_identifier, $.property_identifier), $.jsx_namespace_name),
 
     jsx_attribute: $ => seq(
-      $._jsx_attribute_name,
+      $.jsx_attribute_name,
       optional(seq(
         '=',
-        $._jsx_attribute_value
+        $.jsx_attribute_value
       ))
     ),
 
-    _jsx_attribute_value: $ => choice(
+    jsx_attribute_value: $ => choice(
       $.string,
       $.jsx_expression,
       $._jsx_element,
@@ -1166,4 +1175,8 @@ function commaSep1(rule) {
 
 function commaSep(rule) {
   return optional(commaSep1(rule));
+}
+
+function optional_with_placeholder(field_name, rule) {
+  return choice(field(field_name, rule), field(field_name, blank()));
 }
