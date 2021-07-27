@@ -20,7 +20,6 @@ module.exports = grammar({
   ],
 
   inline: $ => [
-    $._call_signature,
     $._formal_parameter,
     $.statement,
     $._expressions,
@@ -31,8 +30,6 @@ module.exports = grammar({
     $._jsx_element_name,
     $._jsx_child,
     $._jsx_element,
-    $.jsx_attribute_name,
-    $.jsx_attribute_value,
     $._jsx_identifier,
     $._lhs_expression,
   ],
@@ -83,6 +80,7 @@ module.exports = grammar({
     [$.object_assignment_pattern, $.assignment_variable_expression],
     [$.assignment_variable_expression, $.pattern],
     [$.assignment_variable_expression, $.rest_pattern],
+    [$.if_statement],
   ],
 
   word: $ => $.identifier,
@@ -262,19 +260,24 @@ module.exports = grammar({
 
     else_clause: $ => seq('else', $.statement),
 
-    // else_if_clause: $ => seq('else', 'if', $.statement),
-
-    if_clause: $ => seq('if',
-      field('condition', $.parenthesized_expression),
+    else_if_clause: $ => prec(1, seq(
+      'else', 
+      'if', 
+      field('if_condition', $.parenthesized_expression),
       field('consequence', $.statement)
-    ), 
-
-    if_statement: $ => prec.right(seq(
-      $.if_clause,
-
-      
-      optional(field('alternative', $.else_clause))
     )),
+
+    // Penalize this so it doesn't get chosen in else if's. 
+    if_clause: $ => prec(-1, seq('if',
+      field('if_condition', $.parenthesized_expression),
+      field('consequence', $.statement)
+    )), 
+
+    if_statement: $ => seq(
+      $.if_clause,
+      optional_with_placeholder('else_if_list', repeat($.else_if_clause)),
+      optional_with_placeholder('else_clause_placeholder', $.else_clause)
+    ),
 
     switch_statement: $ => seq(
       'switch',
@@ -285,7 +288,7 @@ module.exports = grammar({
     for_statement: $ => seq(
       'for',
       '(',
-      field('initializer', choice(
+      field('for_initializer', choice(
         $.lexical_declaration,
         $.variable_declaration,
         $.expression_statement,
@@ -329,8 +332,8 @@ module.exports = grammar({
 
     while_statement: $ => seq(
       'while',
-      field('condition', $.parenthesized_expression),
-      field('body', $.statement)
+      field('while_condition', $.parenthesized_expression),
+      field('while_body', $.statement)
     ),
 
     do_statement: $ => seq(
@@ -587,7 +590,7 @@ module.exports = grammar({
     jsx_identifier: $ => /[a-zA-Z_$][a-zA-Z\d_$]*-[a-zA-Z\d_$\-]*/,
 
     _jsx_identifier: $ => choice(
-      alias($.jsx_identifier, $.identifier),
+      alias($.jsx_identifier, $.identifier_dedup_alias),
       $.identifier
     ),
 
@@ -662,7 +665,7 @@ module.exports = grammar({
       optional('async'),
       'function',
       field('name', optional($.identifier)),
-      $._call_signature,
+      $.call_signature,
       field('body', $.statement_block)
     )),
 
@@ -670,7 +673,7 @@ module.exports = grammar({
       optional('async'),
       'function',
       field('name', $.identifier),
-      $._call_signature,
+      $.call_signature,
       field('body', $.statement_block),
       optional($._automatic_semicolon)
     )),
@@ -680,7 +683,7 @@ module.exports = grammar({
       'function',
       '*',
       field('name', optional($.identifier)),
-      $._call_signature,
+      $.call_signature,
       field('body', $.statement_block)
     )),
 
@@ -689,7 +692,7 @@ module.exports = grammar({
       'function',
       '*',
       field('name', $.identifier),
-      $._call_signature,
+      $.call_signature,
       field('body', $.statement_block),
       optional($._automatic_semicolon)
     )),
@@ -698,10 +701,10 @@ module.exports = grammar({
       optional('async'),
       choice(
         field('parameter', choice(
-          alias($._reserved_identifier, $.identifier),
+          alias($._reserved_identifier, $.identifier_dedup_alias),
           $.identifier,
         )),
-        $._call_signature
+        $.call_signature
       ),
       '=>',
       field('body', choice(
@@ -711,7 +714,7 @@ module.exports = grammar({
     ),
 
     // Override
-    _call_signature: $ => field('parameters', $.formal_parameters),
+    call_signature: $ => field('parameters', $.formal_parameters),
     _formal_parameter: $ => choice($.pattern, $.assignment_pattern),
 
     call_expression: $ => choice(
@@ -770,7 +773,7 @@ module.exports = grammar({
     _augmented_assignment_lhs: $ => choice(
       $.member_expression,
       $.subscript_expression,
-      alias($._reserved_identifier, $.identifier),
+      alias($._reserved_identifier, $.identifier_dedup_alias),
       $.identifier,
       $.parenthesized_expression,
     ),
@@ -1105,7 +1108,7 @@ module.exports = grammar({
     // not patterns.
     pattern: $ => prec.dynamic(-1, choice(
       $.identifier,
-      alias($._reserved_identifier, $.identifier),
+      alias($._reserved_identifier, $.identifier_dedup_alias),
       $._destructuring_pattern,
       $.rest_pattern
     )),
