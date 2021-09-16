@@ -314,17 +314,17 @@
             "named": true
           }
         ]
-      },
-      "left": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "assignment_variable",
-            "named": true
-          }
-        ]
       }
+    },
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "assignment_variable",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -382,10 +382,6 @@
           "named": true
         },
         {
-          "type": "expression",
-          "named": true
-        },
-        {
           "type": "identifier",
           "named": true
         },
@@ -398,7 +394,7 @@
           "named": true
         },
         {
-          "type": "sequence_expression",
+          "type": "parenthesized_expression",
           "named": true
         },
         {
@@ -690,23 +686,11 @@
         ]
       },
       "left_": {
-        "multiple": true,
+        "multiple": false,
         "required": false,
         "types": [
           {
-            "type": "(",
-            "named": false
-          },
-          {
-            "type": ")",
-            "named": false
-          },
-          {
             "type": "array_pattern",
-            "named": true
-          },
-          {
-            "type": "expression",
             "named": true
           },
           {
@@ -722,7 +706,7 @@
             "named": true
           },
           {
-            "type": "sequence_expression",
+            "type": "parenthesized_expression",
             "named": true
           },
           {
@@ -1408,11 +1392,7 @@
         "required": true,
         "types": [
           {
-            "type": "expression",
-            "named": true
-          },
-          {
-            "type": "sequence_expression",
+            "type": "parenthesized_expression_inner",
             "named": true
           }
         ]
@@ -2156,11 +2136,7 @@
         "required": true,
         "types": [
           {
-            "type": "expression",
-            "named": true
-          },
-          {
-            "type": "sequence_expression",
+            "type": "parenthesized_expression_inner",
             "named": true
           }
         ]
@@ -3331,6 +3307,21 @@
   },
   {
     "type": "parenthesized_expression",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "parenthesized_expression_inner",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "parenthesized_expression_inner",
     "named": true,
     "fields": {},
     "children": {

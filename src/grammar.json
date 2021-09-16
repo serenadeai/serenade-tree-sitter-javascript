@@ -909,7 +909,7 @@
             "name": "condition",
             "content": {
               "type": "SYMBOL",
-              "name": "_expressions"
+              "name": "parenthesized_expression_inner"
             }
           },
           {
@@ -946,7 +946,7 @@
             "name": "condition",
             "content": {
               "type": "SYMBOL",
-              "name": "_expressions"
+              "name": "parenthesized_expression_inner"
             }
           },
           {
@@ -1235,21 +1235,8 @@
                 "name": "_lhs_expression"
               },
               {
-                "type": "SEQ",
-                "members": [
-                  {
-                    "type": "STRING",
-                    "value": "("
-                  },
-                  {
-                    "type": "SYMBOL",
-                    "name": "_expressions"
-                  },
-                  {
-                    "type": "STRING",
-                    "value": ")"
-                  }
-                ]
+                "type": "SYMBOL",
+                "name": "parenthesized_expression"
               }
             ]
           }
@@ -1780,6 +1767,15 @@
         }
       ]
     },
+    "parenthesized_expression_inner": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_expressions"
+        }
+      ]
+    },
     "parenthesized_expression": {
       "type": "SEQ",
       "members": [
@@ -1789,7 +1785,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "_expressions"
+          "name": "parenthesized_expression_inner"
         },
         {
           "type": "STRING",
@@ -2297,11 +2293,11 @@
                   "members": [
                     {
                       "type": "SYMBOL",
-                      "name": "identifier"
+                      "name": "_reserved_identifier"
                     },
                     {
                       "type": "SYMBOL",
-                      "name": "_reserved_identifier"
+                      "name": "identifier"
                     }
                   ]
                 },
@@ -3678,21 +3674,8 @@
       "type": "CHOICE",
       "members": [
         {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "STRING",
-              "value": "("
-            },
-            {
-              "type": "SYMBOL",
-              "name": "_expressions"
-            },
-            {
-              "type": "STRING",
-              "value": ")"
-            }
-          ]
+          "type": "SYMBOL",
+          "name": "parenthesized_expression"
         },
         {
           "type": "SYMBOL",
@@ -3707,12 +3690,8 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "FIELD",
-            "name": "left",
-            "content": {
-              "type": "SYMBOL",
-              "name": "assignment_variable"
-            }
+            "type": "SYMBOL",
+            "name": "assignment_variable"
           },
           {
             "type": "STRING",

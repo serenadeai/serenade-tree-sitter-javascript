@@ -292,7 +292,7 @@ module.exports = grammar({
       'else', 
       'if', 
       '(', 
-      field('condition', $._expressions),
+      field('condition', $.parenthesized_expression_inner),
       ')',
       field('consequence', $.statement)
     )),
@@ -300,7 +300,7 @@ module.exports = grammar({
     // Penalize this so it doesn't get chosen in else if's. 
     if_clause: $ => prec(-1, seq('if',
       '(', 
-      field('condition', $._expressions), 
+      field('condition', $.parenthesized_expression_inner),
       ')',
       field('consequence', $.statement)
     )), 
@@ -358,7 +358,7 @@ module.exports = grammar({
     block_iterator: $ => choice(
       field('left_', choice(
         $._lhs_expression,
-        seq('(', $._expressions, ')'),
+        $.parenthesized_expression
       )),
       seq(
         choice('var', 'let', 'const'),
@@ -374,7 +374,8 @@ module.exports = grammar({
     while_clause: $ => seq(
       'while',
       '(', 
-      field('condition', $._expressions), 
+      field('condition', 
+      $._expressions), 
       ')',
       field('body', $.statement)
     ),
@@ -480,9 +481,11 @@ module.exports = grammar({
       $.brace_enclosed_body
     ),
 
+    parenthesized_expression_inner: $ => seq($._expressions), 
+
     parenthesized_expression: $ => seq(
       '(',
-      $._expressions, 
+      $.parenthesized_expression_inner, 
       ')'
     ),
 
@@ -579,7 +582,7 @@ module.exports = grammar({
 
     object_assignment_pattern: $ => seq(
       field('left', choice(
-        alias(choice($.identifier, $._reserved_identifier), $.shorthand_property_identifier_pattern),
+        alias(choice($._reserved_identifier, $.identifier), $.shorthand_property_identifier_pattern),
         $._destructuring_pattern
       )),
       '=',
@@ -826,10 +829,13 @@ module.exports = grammar({
       $._destructuring_pattern
     ),
 
-    assignment_variable: $ => choice(seq('(', $._expressions, ')'), $._lhs_expression),
+    assignment_variable: $ => choice(
+      $.parenthesized_expression, 
+      $._lhs_expression
+    ),
 
     assignment: $ => prec.right('assign', seq(
-      field('left', $.assignment_variable),
+      $.assignment_variable,
       '=',
       field('assignment_value', $.expression)
     )),
