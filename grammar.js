@@ -2,7 +2,7 @@ module.exports = grammar({
   name: 'javascript',
 
   externals: $ => [
-    $.automatic_semicolon,
+    $._automatic_semicolon,
     $._template_chars
   ],
 
@@ -77,7 +77,7 @@ module.exports = grammar({
     [$.primary_expression, $.method_definition],
     [$.primary_expression, $.rest_pattern],
     [$.primary_expression, $.pattern],
-    [$.primary_expression, $.for_each_clause_iterator],
+    [$.primary_expression, $.block_iterator],
     [$.list, $.array_pattern],
     [$.object, $.object_pattern],
     [$.assignment, $.pattern],
@@ -94,11 +94,14 @@ module.exports = grammar({
     [$.identifier_or_reserved_identifier, $.method_definition], 
     [$.identifier_or_reserved_identifier, $.primary_expression], 
     [$.identifier_or_reserved_identifier, $.primary_expression, $.rest_pattern], 
-    [$.identifier_or_reserved_identifier, $.primary_expression, $.for_each_clause_iterator], 
-    [$.identifier_or_reserved_identifier, $.for_each_clause_iterator], 
+    [$.identifier_or_reserved_identifier, $.primary_expression, $.block_iterator], 
+    [$.identifier_or_reserved_identifier, $.block_iterator], 
     
     [$.primary_expression, $.labeled_statement],
     [$.object_assignment_pattern, $.assignment_variable],
+
+    [$.parenthesized_expression, $.block_iterator], 
+    [$.parenthesized_expression, $.assignment_variable], 
   ],
 
   word: $ => $.identifier,
@@ -256,19 +259,17 @@ module.exports = grammar({
       $._semicolon
     ),
 
-    declaration_assignments: $ => seq(
-      commaSep1($.variable_declarator),
-      $._semicolon),
-
     variable_declaration: $ => field('assignment', seq(
       'var',
-      $.declaration_assignments
-    )),
+      commaSep1($.variable_declarator),
+      $._semicolon)
+    ),
 
     lexical_declaration: $ => field('assignment', seq(
       choice('let', 'const'),
-      $.declaration_assignments
-    )),
+      commaSep1($.variable_declarator),
+      $._semicolon)
+    ),
 
     assignment_variable_declarator: $ => choice($.identifier, $._destructuring_pattern), 
 
@@ -281,7 +282,7 @@ module.exports = grammar({
       '{',
       optional_with_placeholder('statement_list', repeat($.statement)),
       '}',
-      optional($.automatic_semicolon)
+      optional($._automatic_semicolon)
     )),
 
     else_clause: $ => seq('else', $.statement),
@@ -311,7 +312,7 @@ module.exports = grammar({
 
     switch_statement: $ => seq(
       'switch',
-      field('value', seq('(', $.expressions, ')')),
+      field('value', $.parenthesized_expression),
       field('body', $.switch_body)
     ),
 
@@ -320,7 +321,7 @@ module.exports = grammar({
       $.for_each_clause
     ),
 
-    for_clause_initializer: $ => choice(
+    block_initializer: $ => choice(
       $.lexical_declaration,
       $.variable_declaration,
       $.expression_statement,
@@ -335,9 +336,9 @@ module.exports = grammar({
     for_clause: $ => seq(
       'for',
       '(',
-      field('for_clause_initializer_optional', $.for_clause_initializer),
+      field('block_initializer_optional', $.block_initializer),
       field('condition_optional', alias($.for_clause_condition, $.condition)),
-      optional_with_placeholder('for_clause_update_optional', alias($.expressions, $.for_clause_update)),
+      optional_with_placeholder('block_update_optional', alias($.expressions, $.block_update)),
       ')',
       field('brace_enclosed_body', $.statement)
     ),
@@ -346,14 +347,14 @@ module.exports = grammar({
       'for',
       optional('await'),
       '(', 
-      $.for_each_clause_iterator, 
+      $.block_iterator, 
       choice('in', 'of'),
-      field('for_each_clause_collection', $.expressions),
+      field('block_collection', $.expressions),
       ')',
       field('brace_enclosed_body', $.statement)
     ),
 
-    for_each_clause_iterator: $ => choice(
+    block_iterator: $ => choice(
       field('left_', choice(
         $._lhs_expression,
         seq('(', $.expressions, ')'),
@@ -382,7 +383,7 @@ module.exports = grammar({
       'do',
       field('body', $.statement),
       'while',
-      field('condition', seq('(', $.expressions, ')')),
+      field('condition', $.parenthesized_expression),
       $._semicolon
     ),
 
@@ -399,7 +400,7 @@ module.exports = grammar({
 
     with_statement: $ => seq(
       'with',
-      field('object', seq('(', $.expressions, ')')),
+      field('object', $.parenthesized_expression),
       field('body', $.statement)
     ),
 
@@ -481,11 +482,11 @@ module.exports = grammar({
     //
     // Expressions
     //
-    parenthesized_expression: $ => prec(-1, seq(
+    parenthesized_expression: $ => seq(
       '(', 
       $.expressions, 
       ')'
-    )),
+    ),
 
     expressions: $ => choice(
       $.expression,
@@ -709,7 +710,7 @@ module.exports = grammar({
       field('name', $.identifier),
       optional($.class_heritage),
       field('brace_enclosed_body', $.class_body),
-      optional($.automatic_semicolon)
+      optional($._automatic_semicolon)
     )),
 
     class_heritage: $ => seq('extends', $.expression),
@@ -739,7 +740,7 @@ module.exports = grammar({
       field('name', $.identifier),
       $.call_signature_,
       $.brace_enclosed_body,
-      optional($.automatic_semicolon)
+      optional($._automatic_semicolon)
     )),
 
     generator_function: $ => prec('literal', seq(
@@ -758,7 +759,7 @@ module.exports = grammar({
       field('name', $.identifier),
       $.call_signature_,
       $.brace_enclosed_body,
-      optional($.automatic_semicolon)
+      optional($._automatic_semicolon)
     )),
 
     lambda: $ => seq(
@@ -1244,7 +1245,7 @@ module.exports = grammar({
       )
     ),
 
-    _semicolon: $ => choice($.automatic_semicolon, ';')
+    _semicolon: $ => choice($._automatic_semicolon, ';')
   }
 });
 
