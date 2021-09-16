@@ -21,7 +21,7 @@ module.exports = grammar({
   inline: $ => [
     $.call_signature_,
     $.statement,
-    $.expressions,
+    $._expressions,
     $._semicolon,
     $._identifier,
     $._reserved_identifier,
@@ -64,7 +64,7 @@ module.exports = grammar({
     // Modifiers take precedence over identifiers in methods, etc. 
     ['keyword', 'modifier', $.assignment_variable], 
     ['keyword', 'modifier', $.property_name], 
-    ['keyword', 'modifier', $.identifier_or_reserved_identifier], 
+    ['keyword', 'modifier', $.primary_expression], 
 
     // [$.export_statement, $.identifier_or_reserved_identifier],
     // [$.export_statement, $.object_assignment_pattern, $.assignment_variable],
@@ -88,20 +88,21 @@ module.exports = grammar({
     [$.assignment_variable, $.rest_pattern],
     [$.if],
     
-    [$.identifier_or_reserved_identifier, $.export_statement],
-    [$.identifier_or_reserved_identifier, $.assignment_variable], 
-    [$.identifier_or_reserved_identifier, $.lambda], 
-    [$.identifier_or_reserved_identifier, $.method_definition], 
-    [$.identifier_or_reserved_identifier, $.primary_expression], 
-    [$.identifier_or_reserved_identifier, $.primary_expression, $.rest_pattern], 
-    [$.identifier_or_reserved_identifier, $.primary_expression, $.block_iterator], 
-    [$.identifier_or_reserved_identifier, $.block_iterator], 
+    // [$.identifier_or_reserved_identifier, $.export_statement],
+    // [$.identifier_or_reserved_identifier, $.assignment_variable], 
+    // [$.identifier_or_reserved_identifier, $.lambda], 
+    // [$.identifier_or_reserved_identifier, $.method_definition], 
+    // [$.identifier_or_reserved_identifier, $.primary_expression], 
+    // [$.identifier_or_reserved_identifier, $.primary_expression, $.rest_pattern], 
+    // [$.identifier_or_reserved_identifier, $.primary_expression, $.block_iterator], 
+    // [$.identifier_or_reserved_identifier, $.block_iterator], 
     
     [$.primary_expression, $.labeled_statement],
     [$.object_assignment_pattern, $.assignment_variable],
 
     [$.parenthesized_expression, $.block_iterator], 
     [$.parenthesized_expression, $.assignment_variable], 
+    // [$.primary_expression, $.async_modifier],
   ],
 
   word: $ => $.identifier,
@@ -255,7 +256,7 @@ module.exports = grammar({
     ),
 
     expression_statement: $ => seq(
-      $.expressions,
+      $._expressions,
       $._semicolon
     ),
 
@@ -291,7 +292,7 @@ module.exports = grammar({
       'else', 
       'if', 
       '(', 
-      field('condition', $.expressions),
+      field('condition', $._expressions),
       ')',
       field('consequence', $.statement)
     )),
@@ -299,7 +300,7 @@ module.exports = grammar({
     // Penalize this so it doesn't get chosen in else if's. 
     if_clause: $ => prec(-1, seq('if',
       '(', 
-      field('condition', $.expressions), 
+      field('condition', $._expressions), 
       ')',
       field('consequence', $.statement)
     )), 
@@ -338,7 +339,7 @@ module.exports = grammar({
       '(',
       field('block_initializer_optional', $.block_initializer),
       field('condition_optional', alias($.for_clause_condition, $.condition)),
-      optional_with_placeholder('block_update_optional', alias($.expressions, $.block_update)),
+      optional_with_placeholder('block_update_optional', alias($._expressions, $.block_update)),
       ')',
       field('brace_enclosed_body', $.statement)
     ),
@@ -349,7 +350,7 @@ module.exports = grammar({
       '(', 
       $.block_iterator, 
       choice('in', 'of'),
-      field('block_collection', $.expressions),
+      field('block_collection', $._expressions),
       ')',
       field('brace_enclosed_body', $.statement)
     ),
@@ -357,7 +358,7 @@ module.exports = grammar({
     block_iterator: $ => choice(
       field('left_', choice(
         $._lhs_expression,
-        seq('(', $.expressions, ')'),
+        seq('(', $._expressions, ')'),
       )),
       seq(
         choice('var', 'let', 'const'),
@@ -373,7 +374,7 @@ module.exports = grammar({
     while_clause: $ => seq(
       'while',
       '(', 
-      field('condition', $.expressions), 
+      field('condition', $._expressions), 
       ')',
       field('body', $.statement)
     ),
@@ -421,7 +422,7 @@ module.exports = grammar({
       $._semicolon
     ),
 
-    return_value: $ => $.expressions,
+    return_value: $ => $._expressions,
 
     return: $ => seq(
       'return',
@@ -432,7 +433,7 @@ module.exports = grammar({
     throw_statement: $ => seq(
       field('throw', seq(
         'throw',
-        $.expressions
+        $._expressions
       )),
       $._semicolon
     ),
@@ -440,7 +441,7 @@ module.exports = grammar({
     empty_statement: $ => ';',
 
     labeled_statement: $ => prec.dynamic(-1, seq(
-      field('label', alias($.identifier_or_reserved_identifier, $.statement_identifier)),
+      field('label', alias(choice($.identifier, $._reserved_identifier), $.statement_identifier)),
       ':',
       $.statement
     )),
@@ -457,7 +458,7 @@ module.exports = grammar({
 
     case: $ => seq(
       'case',
-      field('value', $.expressions),
+      field('value', $._expressions),
       ':',
       repeat($.statement)
     ),
@@ -479,16 +480,17 @@ module.exports = grammar({
       $.brace_enclosed_body
     ),
 
-    //
-    // Expressions
-    //
     parenthesized_expression: $ => seq(
-      '(', 
-      $.expressions, 
+      '(',
+      $._expressions, 
       ')'
     ),
 
-    expressions: $ => choice(
+    //
+    // Expressions
+    //
+
+    _expressions: $ => choice(
       $.expression,
       $.sequence_expression
     ),
@@ -513,7 +515,7 @@ module.exports = grammar({
       $.member_expression,
       $.parenthesized_expression,
       $._identifier,
-      $.identifier_or_reserved_identifier,
+      alias($._reserved_identifier, $.identifier),
       $.this,
       $.super,
       $.number,
@@ -548,7 +550,7 @@ module.exports = grammar({
         $.spread_element,
         $.method_definition,
         alias(
-          $.identifier_or_reserved_identifier,
+          choice($.identifier, $._reserved_identifier),
           $.shorthand_property_identifier
         )
       ))),
@@ -562,7 +564,7 @@ module.exports = grammar({
         $.rest_pattern,
         $.object_assignment_pattern,
         alias(
-          $.identifier_or_reserved_identifier,
+          choice($.identifier, $._reserved_identifier),
           $.shorthand_property_identifier_pattern
         )
       ))),
@@ -577,7 +579,7 @@ module.exports = grammar({
 
     object_assignment_pattern: $ => seq(
       field('left', choice(
-        alias($.identifier_or_reserved_identifier, $.shorthand_property_identifier_pattern),
+        alias(choice($.identifier, $._reserved_identifier), $.shorthand_property_identifier_pattern),
         $._destructuring_pattern
       )),
       '=',
@@ -765,7 +767,7 @@ module.exports = grammar({
     lambda: $ => seq(
       optional_with_placeholder('modifier_list', $.async_modifier),
       choice(
-        field('parameter', $.identifier_or_reserved_identifier),
+        field('parameter', choice($.identifier, $._reserved_identifier)),
         $.call_signature_
       ),
       '=>',
@@ -813,7 +815,7 @@ module.exports = grammar({
     subscript_expression: $ => prec.right('member', seq(
       field('object', choice($.expression, $.primary_expression)),
       optional('?.'),
-      '[', field('index', $.expressions), ']'
+      '[', field('index', $._expressions), ']'
     )),
 
     _lhs_expression: $ => choice(
@@ -824,7 +826,7 @@ module.exports = grammar({
       $._destructuring_pattern
     ),
 
-    assignment_variable: $ => choice(seq('(', $.expressions, ')'), $._lhs_expression),
+    assignment_variable: $ => choice(seq('(', $._expressions, ')'), $._lhs_expression),
 
     assignment: $ => prec.right('assign', seq(
       field('left', $.assignment_variable),
@@ -835,8 +837,9 @@ module.exports = grammar({
     _augmented_assignment_lhs: $ => choice(
       $.member_expression,
       $.subscript_expression,
-      $.identifier_or_reserved_identifier, 
-      seq('(', $.expressions, ')'),
+      alias($._reserved_identifier, $.identifier_),
+      $.identifier,
+      $.parenthesized_expression,
     ),
 
     augmented_assignment_expression: $ => prec.right('assign', seq(
@@ -1007,7 +1010,7 @@ module.exports = grammar({
 
     template_substitution: $ => seq(
       '${',
-      $.expressions,
+      $._expressions,
       '}'
     ),
 
@@ -1170,10 +1173,11 @@ module.exports = grammar({
     ),
 
     // This negative dynamic precedence ensures that during error recovery,
-    // unfinished constructs are generally treated as literal expressions,
+    // unfinished constructs are generally treated as literal _expressions,
     // not patterns.
     pattern: $ => prec.dynamic(-1, choice(
-      $.identifier_or_reserved_identifier,
+      $.identifier,
+      alias($._reserved_identifier, $.identifier_),
       $._destructuring_pattern,
       $.rest_pattern
     )),
@@ -1216,7 +1220,8 @@ module.exports = grammar({
     ),
 
     property_name: $ => field('identifier', choice(
-      $.identifier_or_reserved_identifier,
+      $.identifier,
+      $._reserved_identifier,
       $.private_property_identifier,
       $.string,
       $.number,
@@ -1237,13 +1242,13 @@ module.exports = grammar({
       'export'
     ),
 
-    identifier_or_reserved_identifier: $ => field(
-      'identifier', 
-      choice(
-        $.identifier, 
-        $._reserved_identifier
-      )
-    ),
+    // identifier_or_reserved_identifier: $ => field(
+    //   'identifier', 
+    //   choice(
+    //     $.identifier, 
+    //     $._reserved_identifier
+    //   )
+    // ),
 
     _semicolon: $ => choice($._automatic_semicolon, ';')
   }

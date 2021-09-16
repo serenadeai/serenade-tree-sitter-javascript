@@ -92,7 +92,11 @@
         "named": true
       },
       {
-        "type": "identifier_or_reserved_identifier",
+        "type": "identifier",
+        "named": true
+      },
+      {
+        "type": "identifier_",
         "named": true
       },
       {
@@ -131,10 +135,6 @@
       },
       {
         "type": "identifier",
-        "named": true
-      },
-      {
-        "type": "identifier_or_reserved_identifier",
         "named": true
       },
       {
@@ -456,23 +456,15 @@
     "named": true,
     "fields": {
       "left": {
-        "multiple": true,
+        "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "(",
-            "named": false
-          },
-          {
-            "type": ")",
-            "named": false
-          },
-          {
-            "type": "expression",
+            "type": "identifier",
             "named": true
           },
           {
-            "type": "identifier_or_reserved_identifier",
+            "type": "identifier_",
             "named": true
           },
           {
@@ -480,7 +472,7 @@
             "named": true
           },
           {
-            "type": "sequence_expression",
+            "type": "parenthesized_expression",
             "named": true
           },
           {
@@ -2120,42 +2112,6 @@
     }
   },
   {
-    "type": "identifier_or_reserved_identifier",
-    "named": true,
-    "fields": {
-      "identifier": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "async",
-            "named": false
-          },
-          {
-            "type": "export",
-            "named": false
-          },
-          {
-            "type": "get",
-            "named": false
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "set",
-            "named": false
-          },
-          {
-            "type": "static",
-            "named": false
-          }
-        ]
-      }
-    }
-  },
-  {
     "type": "if",
     "named": true,
     "fields": {
@@ -2866,8 +2822,28 @@
         "required": false,
         "types": [
           {
-            "type": "identifier_or_reserved_identifier",
+            "type": "async",
+            "named": false
+          },
+          {
+            "type": "export",
+            "named": false
+          },
+          {
+            "type": "get",
+            "named": false
+          },
+          {
+            "type": "identifier",
             "named": true
+          },
+          {
+            "type": "set",
+            "named": false
+          },
+          {
+            "type": "static",
+            "named": false
           }
         ]
       },
@@ -3407,11 +3383,23 @@
         "required": true,
         "types": [
           {
+            "type": "async",
+            "named": false
+          },
+          {
             "type": "computed_property_name",
             "named": true
           },
           {
-            "type": "identifier_or_reserved_identifier",
+            "type": "export",
+            "named": false
+          },
+          {
+            "type": "get",
+            "named": false
+          },
+          {
+            "type": "identifier",
             "named": true
           },
           {
@@ -3421,6 +3409,14 @@
           {
             "type": "private_property_identifier",
             "named": true
+          },
+          {
+            "type": "set",
+            "named": false
+          },
+          {
+            "type": "static",
+            "named": false
           },
           {
             "type": "string",
@@ -3561,78 +3557,6 @@
     }
   },
   {
-    "type": "shorthand_property_identifier",
-    "named": true,
-    "fields": {
-      "identifier": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "async",
-            "named": false
-          },
-          {
-            "type": "export",
-            "named": false
-          },
-          {
-            "type": "get",
-            "named": false
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "set",
-            "named": false
-          },
-          {
-            "type": "static",
-            "named": false
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "shorthand_property_identifier_pattern",
-    "named": true,
-    "fields": {
-      "identifier": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "async",
-            "named": false
-          },
-          {
-            "type": "export",
-            "named": false
-          },
-          {
-            "type": "get",
-            "named": false
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "set",
-            "named": false
-          },
-          {
-            "type": "static",
-            "named": false
-          }
-        ]
-      }
-    }
-  },
-  {
     "type": "spread_element",
     "named": true,
     "fields": {},
@@ -3645,42 +3569,6 @@
           "named": true
         }
       ]
-    }
-  },
-  {
-    "type": "statement_identifier",
-    "named": true,
-    "fields": {
-      "identifier": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "async",
-            "named": false
-          },
-          {
-            "type": "export",
-            "named": false
-          },
-          {
-            "type": "get",
-            "named": false
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "set",
-            "named": false
-          },
-          {
-            "type": "static",
-            "named": false
-          }
-        ]
-      }
     }
   },
   {
@@ -4883,6 +4771,18 @@
   {
     "type": "set",
     "named": false
+  },
+  {
+    "type": "shorthand_property_identifier",
+    "named": true
+  },
+  {
+    "type": "shorthand_property_identifier_pattern",
+    "named": true
+  },
+  {
+    "type": "statement_identifier",
+    "named": true
   },
   {
     "type": "static",
