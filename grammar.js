@@ -79,6 +79,7 @@ module.exports = grammar({
     [$.assignment_variable, $.pattern],
     [$.assignment_variable, $.rest_pattern],
     [$.if],
+    [$.if_clause, $.else_if_clause],
     
     [$.primary_expression, $.labeled_statement],
     [$.object_assignment_pattern, $.assignment_variable],
@@ -96,6 +97,9 @@ module.exports = grammar({
     [$.get_modifier, $.property_name],
     [$.set_modifier, $.property_name],
     [$.static_modifier, $.property_name],
+
+    [$.brace_enclosed_body, $.object],
+    [$.brace_enclosed_body],
   ],
 
   word: $ => $.identifier,
@@ -274,14 +278,15 @@ module.exports = grammar({
 
     brace_enclosed_body: $ => prec.right(seq(
       '{',
-      optional_with_placeholder('statement_list', repeat($.statement)),
+      // repeat($.statement),
+      optional_with_placeholder('statement_list', $.statement_list),
       '}',
       optional($._automatic_semicolon)
     )),
 
     else_clause: $ => seq('else', $.statement),
 
-    else_if_clause: $ => prec(1, seq(
+    else_if_clause: $ => prec.dynamic(1, seq(
       'else', 
       'if', 
       '(', 
@@ -291,7 +296,7 @@ module.exports = grammar({
     )),
 
     // Penalize this so it doesn't get chosen in else if's. 
-    if_clause: $ => prec(-1, seq('if',
+    if_clause: $ => prec.dynamic(0, seq('if',
       '(', 
       field('condition', $.parenthesized_expression_inner),
       ')',
@@ -716,7 +721,7 @@ module.exports = grammar({
 
     function: $ => choice(
       prec.dynamic(1, $.named_function), 
-      prec.dynamic(-1, $.anonymous_function)),  
+      prec.dynamic(0, $.anonymous_function)),  
 
     anonymous_function: $ => prec('anonymous_function', seq(
       optional_with_placeholder('modifier_list', $.async_modifier),
@@ -1190,7 +1195,7 @@ module.exports = grammar({
       )
     ),
 
-    method_definition: $ => seq(
+    method_definition: $ => prec.left(seq(
       repeat($.decorator),
       optional_with_placeholder('modifier_list', 
         seq(
@@ -1205,7 +1210,7 @@ module.exports = grammar({
       field('name', $.property_name),
       field('parameters', $.formal_parameters),
       $.brace_enclosed_body
-    ),
+    )),
 
     key_value_pair: $ => seq(
       field('key_value_pair_key', $.property_name),
