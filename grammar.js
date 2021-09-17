@@ -12,7 +12,7 @@ module.exports = grammar({
   ],
 
   supertypes: $ => [
-    $.declaration,
+    // $.declaration,
     $.expression,
     $.primary_expression,
     $.pattern,
@@ -20,7 +20,7 @@ module.exports = grammar({
 
   inline: $ => [
     $.call_signature_,
-    $.statement,
+    // $.statement,
     $._expressions,
     $._semicolon,
     $._identifier,
@@ -60,14 +60,6 @@ module.exports = grammar({
     [$.primary_expression, $.brace_enclosed_body, 'object'],
     [$.import, $.import_token],
     [$.export_statement, $.primary_expression],
-
-    // Modifiers take precedence over identifiers in methods, etc. 
-    ['keyword', 'modifier', $.assignment_variable], 
-    ['keyword', 'modifier', $.property_name], 
-    ['keyword', 'modifier', $.primary_expression], 
-
-    // [$.export_statement, $.identifier_or_reserved_identifier],
-    // [$.export_statement, $.object_assignment_pattern, $.assignment_variable],
   ],
 
   conflicts: $ => [
@@ -88,21 +80,22 @@ module.exports = grammar({
     [$.assignment_variable, $.rest_pattern],
     [$.if],
     
-    // [$.identifier_or_reserved_identifier, $.export_statement],
-    // [$.identifier_or_reserved_identifier, $.assignment_variable], 
-    // [$.identifier_or_reserved_identifier, $.lambda], 
-    // [$.identifier_or_reserved_identifier, $.method_definition], 
-    // [$.identifier_or_reserved_identifier, $.primary_expression], 
-    // [$.identifier_or_reserved_identifier, $.primary_expression, $.rest_pattern], 
-    // [$.identifier_or_reserved_identifier, $.primary_expression, $.block_iterator], 
-    // [$.identifier_or_reserved_identifier, $.block_iterator], 
-    
     [$.primary_expression, $.labeled_statement],
     [$.object_assignment_pattern, $.assignment_variable],
 
     [$.parenthesized_expression, $.block_iterator], 
     [$.parenthesized_expression, $.assignment_variable], 
-    // [$.primary_expression, $.async_modifier],
+    [$.list_element, $.computed_property_name],
+    
+    [$.async_modifier, $.primary_expression],
+    [$.static_modifier, $.primary_expression],
+    [$.get_modifier, $.primary_expression],
+    [$.set_modifier, $.primary_expression],
+    [$.async_modifier, $.primary_expression, $.property_name],
+    [$.async_modifier, $.property_name],
+    [$.get_modifier, $.property_name],
+    [$.set_modifier, $.property_name],
+    [$.static_modifier, $.property_name],
   ],
 
   word: $ => $.identifier,
@@ -118,11 +111,11 @@ module.exports = grammar({
     hash_bang_line: $ => /#!.*/,
 
     // Modifiers
-    async_modifier: $ => prec('modifier', field('modifier', 'async')),
-    static_modifier: $ => prec('modifier', field('modifier', 'static')),
-    get_modifier: $ => prec('modifier', field('modifier', 'get')),
-    set_modifier: $ => prec('modifier', field('modifier', 'set')),
-    symbol_star_modifier: $ => prec('modifier', field('modifier', '*')),
+    async_modifier: $ => field('modifier', 'async'),
+    static_modifier: $ => field('modifier', 'static'),
+    get_modifier: $ => field('modifier', 'get'),
+    set_modifier: $ => field('modifier', 'set'),
+    symbol_star_modifier: $ => field('modifier', '*'),
 
     //
     // Export declarations
@@ -173,9 +166,9 @@ module.exports = grammar({
     ),
 
     declaration: $ => choice(
-      field('function', $.function_declaration),
+      alias($.function_declaration, $.function),
       $.generator_function_declaration,
-      field('class', $.class_declaration),
+      alias($.class_declaration, $.class),
       $.lexical_declaration,
       $.variable_declaration
     ),
@@ -548,7 +541,8 @@ module.exports = grammar({
 
     object: $ => prec('object', seq(
       '{',
-      optional_with_placeholder('key_value_pair_list', commaSep1(choice(
+      optional_with_placeholder('key_value_pair_list', 
+      commaSep(optional(choice(
         $.key_value_pair,
         $.spread_element,
         $.method_definition,
@@ -556,7 +550,7 @@ module.exports = grammar({
           choice($.identifier, $._reserved_identifier),
           $.shorthand_property_identifier
         )
-      ))),
+      )))),
       '}'
     )),
 
@@ -589,14 +583,14 @@ module.exports = grammar({
       field('right', $.expression)
     ),
 
-    list_element: $ => prec(-1, choice(
+    list_element: $ => choice(
       $.expression,
       $.spread_element
-    )), 
+    ), 
 
     list: $ => seq(
       '[',
-      commaSep($.list_element),
+      commaSep(optional($.list_element)),
       ']'
     ),
 

@@ -96,7 +96,9 @@ f `hello`;
 ---
 
 (program
-  (expression_statement (call_expression (identifier) (template_string))))
+  (statement_list
+    (statement
+      (expression_statement (call (identifier) (template_string))))))
 
 ============================================
 Numbers
@@ -113,13 +115,21 @@ Numbers
 ---
 
 (program
-  (expression_statement (number))
-  (expression_statement (number))
-  (expression_statement (number))
-  (expression_statement (number))
-  (expression_statement (number))
-  (expression_statement (number))
-  (expression_statement (number)))
+  (statement_list
+    (statement
+      (expression_statement (number)))
+    (statement  
+      (expression_statement (number)))
+    (statement  
+      (expression_statement (number)))
+    (statement  
+      (expression_statement (number)))
+    (statement  
+      (expression_statement (number)))
+    (statement  
+      (expression_statement (number)))
+    (statement  
+      (expression_statement (number)))))
 
 ============================================
 Variables
@@ -206,7 +216,8 @@ Comments take precedence over regexes
 
 ---
 
-(program (expression_statement (ternary_expression (identifier) (comment) (identifier) (identifier))))
+(program (statement_list (statement
+  (expression_statement (ternary_expression (identifier) (comment) (identifier) (identifier))))))
 
 ============================================
 Objects
