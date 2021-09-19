@@ -660,7 +660,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "try_statement"
+          "name": "try"
         },
         {
           "type": "SYMBOL",
@@ -1378,7 +1378,7 @@
         }
       ]
     },
-    "try_statement": {
+    "try": {
       "type": "SEQ",
       "members": [
         {
@@ -1839,7 +1839,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "assignment_expression"
+          "name": "assignment"
         },
         {
           "type": "SYMBOL",
@@ -2687,7 +2687,7 @@
           },
           {
             "type": "FIELD",
-            "name": "name",
+            "name": "identifier",
             "content": {
               "type": "SYMBOL",
               "name": "_jsx_element_name"
@@ -2813,7 +2813,7 @@
         },
         {
           "type": "FIELD",
-          "name": "name",
+          "name": "identifier",
           "content": {
             "type": "SYMBOL",
             "name": "_jsx_element_name"
@@ -2834,7 +2834,7 @@
         },
         {
           "type": "FIELD",
-          "name": "name",
+          "name": "identifier",
           "content": {
             "type": "SYMBOL",
             "name": "_jsx_element_name"
@@ -2874,30 +2874,29 @@
         }
       ]
     },
-    "jsx_attribute_name": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "ALIAS",
-          "content": {
+    "_jsx_attribute_name": {
+      "type": "FIELD",
+      "name": "jsx_attribute_name",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
             "type": "SYMBOL",
             "name": "_jsx_identifier"
           },
-          "named": true,
-          "value": "identifier"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "jsx_namespace_name"
-        }
-      ]
+          {
+            "type": "SYMBOL",
+            "name": "jsx_namespace_name"
+          }
+        ]
+      }
     },
     "jsx_attribute": {
       "type": "SEQ",
       "members": [
         {
           "type": "SYMBOL",
-          "name": "jsx_attribute_name"
+          "name": "_jsx_attribute_name"
         },
         {
           "type": "CHOICE",
@@ -2911,7 +2910,7 @@
                 },
                 {
                   "type": "SYMBOL",
-                  "name": "jsx_attribute_value"
+                  "name": "_jsx_attribute_value"
                 }
               ]
             },
@@ -2922,26 +2921,30 @@
         }
       ]
     },
-    "jsx_attribute_value": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "string"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "jsx_expression"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "_jsx_element"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "jsx_fragment"
-        }
-      ]
+    "_jsx_attribute_value": {
+      "type": "FIELD",
+      "name": "jsx_attribute_value",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "string"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "jsx_expression"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_jsx_element"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "jsx_fragment"
+          }
+        ]
+      }
     },
     "class": {
       "type": "PREC",
@@ -3135,20 +3138,16 @@
             "value": "function"
           },
           {
-            "type": "FIELD",
-            "name": "name",
-            "content": {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "SYMBOL",
-                  "name": "identifier"
-                },
-                {
-                  "type": "BLANK"
-                }
-              ]
-            }
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "identifier"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
           },
           {
             "type": "SYMBOL",
@@ -3715,7 +3714,7 @@
         }
       ]
     },
-    "assignment_expression": {
+    "assignment": {
       "type": "PREC_RIGHT",
       "value": "assign",
       "content": {
@@ -3882,7 +3881,7 @@
         },
         {
           "type": "FIELD",
-          "name": "value",
+          "name": "assignment_value",
           "content": {
             "type": "SYMBOL",
             "name": "expression"
@@ -6628,33 +6627,37 @@
       ]
     },
     "property_name": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "identifier"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "_reserved_identifier"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "private_property_identifier"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "string"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "number"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "computed_property_name"
-        }
-      ]
+      "type": "FIELD",
+      "name": "identifier",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "identifier"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_reserved_identifier"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "private_property_identifier"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "string"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "number"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "computed_property_name"
+          }
+        ]
+      }
     },
     "computed_property_name": {
       "type": "SEQ",
@@ -6761,11 +6764,11 @@
       "object_pattern"
     ],
     [
-      "assignment_expression",
+      "assignment",
       "pattern"
     ],
     [
-      "assignment_expression",
+      "assignment",
       "object_assignment_pattern"
     ],
     [
@@ -6979,8 +6982,8 @@
     "_jsx_element_name",
     "_jsx_child",
     "_jsx_element",
-    "jsx_attribute_name",
-    "jsx_attribute_value",
+    "_jsx_attribute_name",
+    "_jsx_attribute_value",
     "_jsx_identifier",
     "_lhs_expression"
   ],

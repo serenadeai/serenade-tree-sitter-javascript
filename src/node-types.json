@@ -4,7 +4,7 @@
     "named": true,
     "subtypes": [
       {
-        "type": "assignment_expression",
+        "type": "assignment",
         "named": true
       },
       {
@@ -264,7 +264,7 @@
     }
   },
   {
-    "type": "assignment_expression",
+    "type": "assignment",
     "named": true,
     "fields": {
       "assignment_value": {
@@ -317,7 +317,7 @@
     "type": "assignment_initializer",
     "named": true,
     "fields": {
-      "value": {
+      "assignment_value": {
         "multiple": false,
         "required": true,
         "types": [
@@ -1411,6 +1411,16 @@
           }
         ]
       }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -1650,45 +1660,6 @@
   {
     "type": "jsx_attribute",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "jsx_element",
-          "named": true
-        },
-        {
-          "type": "jsx_expression",
-          "named": true
-        },
-        {
-          "type": "jsx_fragment",
-          "named": true
-        },
-        {
-          "type": "jsx_namespace_name",
-          "named": true
-        },
-        {
-          "type": "jsx_self_closing_element",
-          "named": true
-        },
-        {
-          "type": "string",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "jsx_closing_element",
-    "named": true,
     "fields": {
       "identifier": {
         "multiple": false,
@@ -1704,8 +1675,58 @@
           }
         ]
       },
-      "name": {
+      "jsx_attribute_name": {
         "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "jsx_identifier",
+            "named": true
+          },
+          {
+            "type": "jsx_namespace_name",
+            "named": true
+          }
+        ]
+      },
+      "jsx_attribute_value": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "jsx_element",
+            "named": true
+          },
+          {
+            "type": "jsx_expression",
+            "named": true
+          },
+          {
+            "type": "jsx_fragment",
+            "named": true
+          },
+          {
+            "type": "jsx_self_closing_element",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "jsx_closing_element",
+    "named": true,
+    "fields": {
+      "identifier": {
+        "multiple": true,
         "required": true,
         "types": [
           {
@@ -1874,21 +1895,7 @@
         ]
       },
       "identifier": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "jsx_identifier",
-            "named": true
-          }
-        ]
-      },
-      "name": {
-        "multiple": false,
+        "multiple": true,
         "required": true,
         "types": [
           {
@@ -1930,21 +1937,7 @@
         ]
       },
       "identifier": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "jsx_identifier",
-            "named": true
-          }
-        ]
-      },
-      "name": {
-        "multiple": false,
+        "multiple": true,
         "required": true,
         "types": [
           {
@@ -2561,32 +2554,53 @@
   {
     "type": "property_name",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": false,
-      "types": [
-        {
-          "type": "computed_property_name",
-          "named": true
-        },
-        {
-          "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "private_property_identifier",
-          "named": true
-        },
-        {
-          "type": "string",
-          "named": true
-        }
-      ]
+    "fields": {
+      "identifier": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "async",
+            "named": false
+          },
+          {
+            "type": "computed_property_name",
+            "named": true
+          },
+          {
+            "type": "export",
+            "named": false
+          },
+          {
+            "type": "get",
+            "named": false
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "private_property_identifier",
+            "named": true
+          },
+          {
+            "type": "set",
+            "named": false
+          },
+          {
+            "type": "static",
+            "named": false
+          },
+          {
+            "type": "string",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -2791,7 +2805,7 @@
           "named": true
         },
         {
-          "type": "try_statement",
+          "type": "try",
           "named": true
         },
         {
@@ -3044,23 +3058,7 @@
     }
   },
   {
-    "type": "try_clause",
-    "named": true,
-    "fields": {
-      "body": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "brace_enclosed_body",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "try_statement",
+    "type": "try",
     "named": true,
     "fields": {
       "catch_list": {
@@ -3093,6 +3091,22 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "try_clause",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "brace_enclosed_body",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {

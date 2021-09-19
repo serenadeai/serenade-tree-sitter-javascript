@@ -29,8 +29,8 @@ module.exports = grammar({
     $._jsx_element_name,
     $._jsx_child,
     $._jsx_element,
-    $.jsx_attribute_name,
-    $.jsx_attribute_value,
+    $._jsx_attribute_name,
+    $._jsx_attribute_value,
     $._jsx_identifier,
     $._lhs_expression,
   ],
@@ -74,8 +74,8 @@ module.exports = grammar({
     [$.primary_expression, $.block_iterator],
     [$.array, $.array_pattern],
     [$.object, $.object_pattern],
-    [$.assignment_expression, $.pattern],
-    [$.assignment_expression, $.object_assignment_pattern],
+    [$.assignment, $.pattern],
+    [$.assignment, $.object_assignment_pattern],
     [$.labeled_statement, $.property_name],
     [$.computed_property_name, $.array],
 
@@ -230,7 +230,7 @@ module.exports = grammar({
       $.for,
       $.while,
       $.do_statement,
-      $.try_statement,
+      $.try,
       $.with_statement,
 
       $.break_statement,
@@ -384,7 +384,7 @@ module.exports = grammar({
       field('body', $.brace_enclosed_body),
     ),
 
-    try_statement: $ => seq(
+    try: $ => seq(
       $.try_clause,
       optional_with_placeholder('catch_list', $.catch),
       optional_with_placeholder('finally_clause_optional', $.finally_clause)
@@ -494,7 +494,7 @@ module.exports = grammar({
       $.primary_expression,
       $._jsx_element,
       $.jsx_fragment,
-      $.assignment_expression,
+      $.assignment,
       $.augmented_assignment_expression,
       $.await_expression,
       $.unary_expression,
@@ -634,7 +634,7 @@ module.exports = grammar({
 
     jsx_opening_element: $ => prec.dynamic(-1, seq(
       '<',
-      field('name', $._jsx_element_name),
+      field('identifier', $._jsx_element_name),
       repeat(field('attribute', $._jsx_attribute)),
       '>'
     )),
@@ -663,13 +663,13 @@ module.exports = grammar({
     jsx_closing_element: $ => seq(
       '<',
       '/',
-      field('name', $._jsx_element_name),
+      field('identifier', $._jsx_element_name),
       '>'
     ),
 
     jsx_self_closing_element: $ => seq(
       '<',
-      field('name', $._jsx_element_name),
+      field('identifier', $._jsx_element_name),
       repeat(field('attribute', $._jsx_attribute)),
       '/',
       '>'
@@ -677,21 +677,25 @@ module.exports = grammar({
 
     _jsx_attribute: $ => choice($.jsx_attribute, $.jsx_expression),
 
-    jsx_attribute_name: $ => choice(alias($._jsx_identifier, $.identifier), $.jsx_namespace_name),
+    _jsx_attribute_name: $ => field('jsx_attribute_name', 
+      choice($._jsx_identifier, $.jsx_namespace_name)
+    ),
 
     jsx_attribute: $ => seq(
-      $.jsx_attribute_name,
+      $._jsx_attribute_name,
       optional(seq(
         '=',
-        $.jsx_attribute_value
+        $._jsx_attribute_value
       ))
     ),
 
-    jsx_attribute_value: $ => choice(
-      $.string,
-      $.jsx_expression,
-      $._jsx_element,
-      $.jsx_fragment
+    _jsx_attribute_value: $ => field('jsx_attribute_value',
+      choice(
+        $.string,
+        $.jsx_expression,
+        $._jsx_element,
+        $.jsx_fragment
+      )
     ),
 
     // Note that typescript overrides usage of class_heritage and the class/declaration constructs directly.
@@ -717,7 +721,7 @@ module.exports = grammar({
     function: $ => prec('literal', seq(
       optional_with_placeholder('modifier_list', $.async_modifier),
       'function',
-      field('name', optional($.identifier)),
+      optional($.identifier),
       $._call_signature,
       field('body', $.brace_enclosed_body)
     )),
@@ -815,7 +819,7 @@ module.exports = grammar({
       $._destructuring_pattern
     ),
 
-    assignment_expression: $ => prec.right('assign', seq(
+    assignment: $ => prec.right('assign', seq(
       field('assignment_variable', choice($.parenthesized_expression, $._lhs_expression)),
       '=',
       field('assignment_value', $.expression)
@@ -838,7 +842,7 @@ module.exports = grammar({
 
     assignment_initializer: $ => seq(
       '=',
-      field('value', $.expression)
+      field('assignment_value', $.expression)
     ),
 
     _destructuring_pattern: $ => choice(
@@ -1209,14 +1213,14 @@ module.exports = grammar({
       field('key_value_pair_value', $.pattern)
     ),
 
-    property_name: $ => choice(
+    property_name: $ => field('identifier', choice(
       $.identifier,
       $._reserved_identifier,
       $.private_property_identifier,
       $.string,
       $.number,
       $.computed_property_name
-    ),
+    )),
 
     computed_property_name: $ => seq(
       '[',
