@@ -1113,11 +1113,11 @@ module.exports = grammar({
 
     decorator: $ => seq(
       '@',
-      choice(
+      field('decorator_value', choice(
         $.identifier,
         alias($.decorator_member_expression, $.member_expression),
         alias($.decorator_call_expression, $.call)
-      )
+      ))
     ),
 
     decorator_member_expression: $ => prec('member', seq(

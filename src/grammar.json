@@ -6078,31 +6078,35 @@
           "value": "@"
         },
         {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "identifier"
-            },
-            {
-              "type": "ALIAS",
-              "content": {
+          "type": "FIELD",
+          "name": "decorator_value",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
                 "type": "SYMBOL",
-                "name": "decorator_member_expression"
+                "name": "identifier"
               },
-              "named": true,
-              "value": "member_expression"
-            },
-            {
-              "type": "ALIAS",
-              "content": {
-                "type": "SYMBOL",
-                "name": "decorator_call_expression"
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "decorator_member_expression"
+                },
+                "named": true,
+                "value": "member_expression"
               },
-              "named": true,
-              "value": "call"
-            }
-          ]
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "decorator_call_expression"
+                },
+                "named": true,
+                "value": "call"
+              }
+            ]
+          }
         }
       ]
     },
