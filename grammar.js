@@ -246,21 +246,21 @@ module.exports = grammar({
       $._semicolon
     ),
 
-    variable_declaration: $ => field('assignment', seq(
+    variable_declaration: $ => seq(
       'var',
-      commaSep1($.variable_declarator),
+      field('assignment_list', commaSep1(alias($.variable_declarator, $.assignment))),
       $._semicolon
-    )),
+    ),
 
-    lexical_declaration: $ => field('assignment', seq(
+    lexical_declaration: $ => seq(
       choice('let', 'const'),
-      commaSep1($.variable_declarator),
+      field('assignment_list', commaSep1(alias($.variable_declarator, $.assignment))),
       $._semicolon
-    )),
+    ),
 
     variable_declarator: $ => seq(
       field('assignment_variable', choice($.identifier, $._destructuring_pattern)),
-      optional($.assignment_initializer)
+      optional_with_placeholder('assignment_value_list_optional', $.assignment_initializer)
     ),
 
     brace_enclosed_body: $ => prec.right(seq(
@@ -540,15 +540,17 @@ module.exports = grammar({
 
     object: $ => prec('object', seq(
       '{',
-      commaSep(optional(choice(
-        $.key_value_pair,
-        $.spread_element,
-        $.method_definition,
-        alias(
-          choice($.identifier, $._reserved_identifier),
-          $.shorthand_property_identifier
-        )
-      ))),
+      field('key_value_pair_list',
+        commaSep(optional(choice(
+          $.key_value_pair,
+          $.spread_element,
+          $.method_definition,
+          alias(
+            choice($.identifier, $._reserved_identifier),
+            $.shorthand_property_identifier
+          )
+        )))
+      ),
       '}'
     )),
 
@@ -601,22 +603,22 @@ module.exports = grammar({
       ']'
     ),
 
-    _jsx_element: $ => choice($.jsx_element, $.jsx_self_closing_element),
+    _jsx_element: $ => choice($.markup_element, $.markup_singleton_tag),
 
-    jsx_element: $ => seq(
-      field('open_tag', $.jsx_opening_element),
-      optional_with_placeholder('jsx_html_content', repeat($._jsx_child)),
-      field('close_tag', $.jsx_closing_element)
+    markup_element: $ => seq(
+      field('open_tag', $.markup_opening_tag),
+      optional_with_placeholder('markup_element_content', repeat($._jsx_child)),
+      field('close_tag', $.markup_closing_tag)
     ),
 
     jsx_fragment: $ => seq('<', '>', repeat($._jsx_child), '<', '/', '>'),
 
     jsx_text: $ => /[^{}<>]+/,
 
-    jsx_expression: $ => seq(
+    jsx_embedded_expression: $ => seq(
       '{',
       optional(
-        field('jsx_expression_body', choice(
+        field('expression', choice(
           $.expression,
           $.sequence_expression,
           $.spread_element
@@ -629,13 +631,13 @@ module.exports = grammar({
       $.jsx_text,
       $._jsx_element,
       $.jsx_fragment,
-      $.jsx_expression
+      $.jsx_embedded_expression
     ),
 
-    jsx_opening_element: $ => prec.dynamic(-1, seq(
+    markup_opening_tag: $ => prec.dynamic(-1, seq(
       '<',
       field('identifier', $._jsx_element_name),
-      repeat(field('attribute', $._jsx_attribute)),
+      optional_with_placeholder('markup_attribute_list', repeat($._jsx_attribute)),
       '>'
     )),
 
@@ -660,28 +662,28 @@ module.exports = grammar({
       $.jsx_namespace_name,
     ),
 
-    jsx_closing_element: $ => seq(
+    markup_closing_tag: $ => seq(
       '<',
       '/',
       field('identifier', $._jsx_element_name),
       '>'
     ),
 
-    jsx_self_closing_element: $ => seq(
+    markup_singleton_tag: $ => seq(
       '<',
       field('identifier', $._jsx_element_name),
-      repeat(field('attribute', $._jsx_attribute)),
+      optional_with_placeholder('markup_attribute_list', repeat($._jsx_attribute)),
       '/',
       '>'
     ),
 
-    _jsx_attribute: $ => choice($.jsx_attribute, $.jsx_expression),
+    _jsx_attribute: $ => choice($.markup_attribute, $.jsx_embedded_expression),
 
-    _jsx_attribute_name: $ => field('jsx_attribute_name', 
+    _jsx_attribute_name: $ => field('markup_attribute_name', 
       choice($._jsx_identifier, $.jsx_namespace_name)
     ),
 
-    jsx_attribute: $ => seq(
+    markup_attribute: $ => seq(
       $._jsx_attribute_name,
       optional(seq(
         '=',
@@ -689,10 +691,10 @@ module.exports = grammar({
       ))
     ),
 
-    _jsx_attribute_value: $ => field('jsx_attribute_value',
+    _jsx_attribute_value: $ => field('markup_attribute_value',
       choice(
         $.string,
-        $.jsx_expression,
+        $.jsx_embedded_expression,
         $._jsx_element,
         $.jsx_fragment
       )
@@ -1126,7 +1128,7 @@ module.exports = grammar({
         alias($.decorator_member_expression, $.member_expression)
       )),
       '.',
-      field('property', alias($.identifier, $.property_identifier))
+      field('property_', alias($.identifier, $.property_identifier))
     )),
 
     decorator_call_expression: $ => prec('call', seq(
@@ -1148,14 +1150,18 @@ module.exports = grammar({
 
     class_member: $ => choice(
       seq(field('member', $.method_definition), optional(';')),
-      seq(field('member', $.field_definition), $._semicolon)
+      seq(field('property', $.field_definition), $._semicolon)
     ),
 
     field_definition: $ => seq(
       optional_with_placeholder('decorator_list', repeat($.decorator)),
       optional_with_placeholder('modifier_list', $.static_modifier),
-      field('property', $.property_name),
-      optional($.assignment_initializer)
+      field('assignment_list', alias($.field_assignment, $.assignment))
+    ),
+
+    field_assignment: $ => seq(
+      field('assignment_variable', $.property_name),
+      optional_with_placeholder('assignment_value_list_optional', $.assignment_initializer)
     ),
 
     formal_parameters: $ => seq(
