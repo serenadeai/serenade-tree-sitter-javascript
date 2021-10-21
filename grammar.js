@@ -59,7 +59,7 @@ module.exports = grammar({
     ['assign', $.primary_expression],
     ['member', 'new', 'call', $.expression],
     ['declaration', 'literal'],
-    [$.primary_expression, $.brace_enclosed_body, 'object'],
+    [$.primary_expression, $.enclosed_body, 'object'],
     [$.import, $.import_token],
     [$.export_statement, $.primary_expression],
   ],
@@ -223,7 +223,7 @@ module.exports = grammar({
       $.debugger_statement,
       $.expression_statement,
       $.declaration,
-      $.brace_enclosed_body,
+      $.enclosed_body,
 
       $.if,
       $.switch_statement,
@@ -263,7 +263,7 @@ module.exports = grammar({
       optional_with_placeholder('assignment_value_list_optional', $.assignment_initializer)
     ),
 
-    brace_enclosed_body: $ => prec.right(seq(
+    enclosed_body: $ => prec.right(seq(
       '{',
       optional_with_placeholder('statement_list', $.statement_list),
       '}',
@@ -381,7 +381,7 @@ module.exports = grammar({
 
     try_clause: $ => seq(
       'try', 
-      field('body', $.brace_enclosed_body),
+      field('body', $.enclosed_body),
     ),
 
     try: $ => seq(
@@ -398,13 +398,13 @@ module.exports = grammar({
 
     break_statement: $ => seq(
       'break',
-      field('label', optional(alias($.identifier, $.statement_identifier))),
+      optional(alias($.identifier, $.statement_identifier)),
       $._semicolon
     ),
 
     continue_statement: $ => seq(
       'continue',
-      field('label', optional(alias($.identifier, $.statement_identifier))),
+      optional(alias($.identifier, $.statement_identifier)),
       $._semicolon
     ),
 
@@ -432,7 +432,7 @@ module.exports = grammar({
     empty_statement: $ => ';',
 
     labeled_statement: $ => prec.dynamic(-1, seq(
-      field('label', alias(choice($.identifier, $._reserved_identifier), $.statement_identifier)),
+      field('label', choice($.identifier, $._reserved_identifier)),
       ':',
       $.statement
     )),
@@ -463,14 +463,14 @@ module.exports = grammar({
     catch: $ => seq(
       'catch',
       optional(seq('(', $.catch_parameter, ')')),
-      field('body', $.brace_enclosed_body)
+      field('body', $.enclosed_body)
     ),
 
     catch_parameter: $ => choice($.identifier, $._destructuring_pattern),
 
     finally_clause: $ => seq(
       'finally',
-      field('body', $.brace_enclosed_body)
+      field('body', $.enclosed_body)
     ),
 
     parenthesized_expression: $ => seq(
@@ -540,15 +540,12 @@ module.exports = grammar({
 
     object: $ => prec('object', seq(
       '{',
-      field('key_value_pair_list',
+      optional_with_placeholder('key_value_pair_list',
         commaSep(optional(choice(
           $.key_value_pair,
           $.spread_element,
           $.method_definition,
-          alias(
-            choice($.identifier, $._reserved_identifier),
-            $.shorthand_property_identifier
-          )
+          choice($.identifier, $._reserved_identifier),
         )))
       ),
       '}'
@@ -560,10 +557,7 @@ module.exports = grammar({
         $.pair_pattern,
         $.rest_pattern,
         $.object_assignment_pattern,
-        alias(
-          choice($.identifier, $._reserved_identifier),
-          $.shorthand_property_identifier_pattern
-        )
+        choice($.identifier, $._reserved_identifier),
       ))),
       '}'
     )),
@@ -576,7 +570,7 @@ module.exports = grammar({
 
     object_assignment_pattern: $ => seq(
       field('left', choice(
-        alias(choice($._reserved_identifier, $.identifier), $.shorthand_property_identifier_pattern),
+        choice($._reserved_identifier, $.identifier),
         $._destructuring_pattern
       )),
       '=',
@@ -615,10 +609,10 @@ module.exports = grammar({
 
     jsx_text: $ => /[^{}<>]+/,
 
-    jsx_embedded_expression: $ => seq(
+    jsx_embedded_expression_block: $ => seq(
       '{',
       optional(
-        field('expression', choice(
+        field('jsx_embedded_expression', choice(
           $.expression,
           $.sequence_expression,
           $.spread_element
@@ -631,7 +625,7 @@ module.exports = grammar({
       $.jsx_text,
       $._jsx_element,
       $.jsx_fragment,
-      $.jsx_embedded_expression
+      alias($.jsx_embedded_expression_block, $.enclosed_body)
     ),
 
     markup_opening_tag: $ => prec.dynamic(-1, seq(
@@ -677,7 +671,7 @@ module.exports = grammar({
       '>'
     ),
 
-    _jsx_attribute: $ => choice($.markup_attribute, $.jsx_embedded_expression),
+    _jsx_attribute: $ => choice($.markup_attribute, alias($.jsx_embedded_expression_block, $.enclosed_body)),
 
     _jsx_attribute_name: $ => field('markup_attribute_name', 
       choice($._jsx_identifier, $.jsx_namespace_name)
@@ -694,7 +688,7 @@ module.exports = grammar({
     _jsx_attribute_value: $ => field('markup_attribute_value',
       choice(
         $.string,
-        $.jsx_embedded_expression,
+        alias($.jsx_embedded_expression_block, $.enclosed_body),
         $._jsx_element,
         $.jsx_fragment
       )
@@ -725,7 +719,7 @@ module.exports = grammar({
       'function',
       optional($.identifier),
       $._call_signature,
-      field('body', $.brace_enclosed_body)
+      field('body', $.enclosed_body)
     )),
 
     function_declaration: $ => prec.right('declaration', seq(
@@ -733,7 +727,7 @@ module.exports = grammar({
       'function',
       field('name', $.identifier),
       $._call_signature,
-      field('body', $.brace_enclosed_body),
+      field('body', $.enclosed_body),
       optional($._automatic_semicolon)
     )),
 
@@ -741,9 +735,9 @@ module.exports = grammar({
       optional_with_placeholder('modifier_list', $.async_modifier),
       'function',
       '*',
-      field('name', optional($.identifier)),
+      optional($.identifier),
       $._call_signature,
-      field('body', $.brace_enclosed_body)
+      field('body', $.enclosed_body)
     )),
 
     generator_function_declaration: $ => prec.right('declaration', seq(
@@ -752,7 +746,7 @@ module.exports = grammar({
       '*',
       field('name', $.identifier),
       $._call_signature,
-      field('body', $.brace_enclosed_body),
+      field('body', $.enclosed_body),
       optional($._automatic_semicolon)
     )),
 
@@ -766,10 +760,10 @@ module.exports = grammar({
         $._call_signature
       ),
       '=>',
-      field('body', choice(
+      choice(
         field('return_value', $.expression),
-        $.brace_enclosed_body
-      ))
+        $.enclosed_body
+      )
     ),
 
     // Override
@@ -791,7 +785,7 @@ module.exports = grammar({
     new_expression: $ => prec.right('new', seq(
       'new',
       field('constructor', $.primary_expression),
-      field('arguments_', optional(prec.dynamic(1, $.arguments)))
+      optional(prec.dynamic(1, $.arguments))
     )),
 
     await_expression: $ => seq(
@@ -1107,7 +1101,7 @@ module.exports = grammar({
     
     arguments: $ => seq(
       '(',
-      field('argument_list', 
+      optional_with_placeholder('argument_list', 
         commaSep(optional($.argument))
       ),
       ')'
@@ -1204,7 +1198,7 @@ module.exports = grammar({
       ),
       field('name', $.property_name),
       field('parameters', $.formal_parameters),
-      field('body', $.brace_enclosed_body)
+      field('body', $.enclosed_body)
     ),
 
     key_value_pair: $ => seq(
