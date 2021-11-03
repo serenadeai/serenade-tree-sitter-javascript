@@ -27,7 +27,7 @@ module.exports = grammar({
     $._reserved_identifier,
     $._jsx_attribute,
     $._jsx_element_name,
-    $._jsx_child,
+    // $.jsx_child,
     $._jsx_element,
     $._jsx_attribute_name,
     $._jsx_attribute_value,
@@ -104,6 +104,7 @@ module.exports = grammar({
 
     // Modifiers
     async_modifier: $ => field('modifier', 'async'),
+    await_modifier: $ => field('modifier', 'await'),
     static_modifier: $ => field('modifier', 'static'),
     accessors_modifier: $ => field('modifier',
       choice('get', 'set', '*')
@@ -337,7 +338,7 @@ module.exports = grammar({
 
     for_each_clause: $ => seq(
       'for',
-      optional('await'),
+      optional_with_placeholder('modifier_list', $.await_modifier),
       '(', 
       $.block_iterator,
       choice('in', 'of'),
@@ -522,7 +523,7 @@ module.exports = grammar({
       $.null,
       $.import_token,
       $.object,
-      alias($.array, $.list),
+      $.array,
       $.function,
       $.lambda,
       $.generator_function,
@@ -584,7 +585,7 @@ module.exports = grammar({
 
     array: $ => seq(
       '[',
-      commaSep(optional(alias($.array_element, $.list_element))),
+      optional_with_placeholder('list', commaSep(optional(alias($.array_element, $.list_element)))),
       ']'
     ),
 
@@ -601,11 +602,11 @@ module.exports = grammar({
 
     markup_element: $ => seq(
       field('open_tag', $.markup_opening_tag),
-      optional_with_placeholder('markup_element_content', repeat($._jsx_child)),
+      optional_with_placeholder('markup_element_content', repeat($.jsx_child)),
       field('close_tag', $.markup_closing_tag)
     ),
 
-    jsx_fragment: $ => seq('<', '>', repeat($._jsx_child), '<', '/', '>'),
+    jsx_fragment: $ => seq('<', '>', repeat($.jsx_child), '<', '/', '>'),
 
     jsx_text: $ => /[^{}<>]+/,
 
@@ -621,7 +622,7 @@ module.exports = grammar({
       '}'
     ),
 
-    _jsx_child: $ => choice(
+    jsx_child: $ => choice(
       $.jsx_text,
       $._jsx_element,
       $.jsx_fragment,
@@ -757,7 +758,7 @@ module.exports = grammar({
           $._reserved_identifier,
           $.identifier,
         )),
-        $._call_signature
+        $.lambda_call_signature
       ),
       '=>',
       choice(
@@ -765,6 +766,8 @@ module.exports = grammar({
         $.enclosed_body
       )
     ),
+
+    lambda_call_signature: $ => field('parameter_list_optional', $.formal_parameters), 
 
     // Override
     _call_signature: $ => field('parameters', $.formal_parameters),
@@ -1109,7 +1112,7 @@ module.exports = grammar({
 
     decorator: $ => seq(
       '@',
-      field('decorator_value', choice(
+      field('decorator_expression', choice(
         $.identifier,
         alias($.decorator_member_expression, $.member_expression),
         alias($.decorator_call_expression, $.call)
@@ -1137,13 +1140,13 @@ module.exports = grammar({
       '{',
       optional_with_placeholder(
         'class_member_list', 
-        repeat($.class_member)
+        repeat(alias($.class_member, $.member))
       ),
       '}'
     ),
 
     class_member: $ => choice(
-      seq(field('member', $.method_definition), optional(';')),
+      seq(field('member_', $.method_definition), optional(';')),
       seq(field('property', $.field_definition), $._semicolon)
     ),
 
