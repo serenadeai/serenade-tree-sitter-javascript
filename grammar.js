@@ -602,7 +602,7 @@ module.exports = grammar({
 
     markup_element: $ => seq(
       field('open_tag', $.markup_opening_tag),
-      optional_with_placeholder('markup_element_content', repeat($.jsx_child)),
+      optional_with_placeholder('markup_content_list', repeat(alias($.jsx_child, $.markup_content))),
       field('close_tag', $.markup_closing_tag)
     ),
 
