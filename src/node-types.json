@@ -619,10 +619,6 @@
           "named": true
         },
         {
-          "type": "lexical_declaration",
-          "named": true
-        },
-        {
           "type": "variable_declaration",
           "named": true
         }
@@ -956,10 +952,6 @@
         },
         {
           "type": "generator_function_declaration",
-          "named": true
-        },
-        {
-          "type": "lexical_declaration",
           "named": true
         },
         {
@@ -1922,26 +1914,6 @@
         "types": [
           {
             "type": "formal_parameters",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "lexical_declaration",
-    "named": true,
-    "fields": {
-      "assignment_list": {
-        "multiple": true,
-        "required": true,
-        "types": [
-          {
-            "type": ",",
-            "named": false
-          },
-          {
-            "type": "assignment",
             "named": true
           }
         ]
