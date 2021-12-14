@@ -6,26 +6,18 @@ module.exports = grammar({
   extras: ($) => [$.comment, /[\s\uFEFF\u2060\u200B\u00A0]/],
 
   supertypes: ($) => [
-    // $.declaration,
-    $.expression,
-    $.primary_expression,
-    $.pattern,
   ],
 
   inline: ($) => [
     $._call_signature,
-    // $.parameter,
     $._expressions,
     $._semicolon,
     $._identifier,
-    $._reserved_identifier,
     $._jsx_attribute,
     $._jsx_element_name,
-    // $.jsx_child,
     $._jsx_element,
     $._jsx_attribute_name,
     $._jsx_attribute_value,
-    $._jsx_identifier,
     $._lhs_expression,
   ],
 
@@ -82,6 +74,21 @@ module.exports = grammar({
     [$.primary_expression, $.async_modifier, $.property_name],
     [$.primary_expression, $.static_modifier],
     [$.primary_expression, $.accessors_modifier],
+
+    [$.async_modifier, $.reserved_identifier_],
+    [$.export_statement, $.reserved_identifier_],
+    [$.static_modifier, $.reserved_identifier_],
+    [$.accessors_modifier, $.reserved_identifier_],
+
+    [$.object_assignment_pattern, $.identifier_or_reserved],
+    [$.pattern, $.identifier_or_reserved],
+    [$.primary_expression, $.identifier_or_reserved],
+    [$.rest_pattern, $.identifier_or_reserved],
+    [$.property_name, $.identifier_or_reserved],
+
+    [$.object, $.object_pattern, $.identifier_or_reserved],
+
+    // `object`, `object_pattern`, `identifier_or_reserved`
   ],
 
   word: ($) => $.identifier,
@@ -145,8 +152,10 @@ module.exports = grammar({
         alias($.function_declaration, $.function),
         $.generator_function_declaration,
         alias($.class_declaration, $.class),
-        alias($.lexical_declaration, $.variable_declaration),
-        $.variable_declaration
+        field("variable_declaration", choice(
+          $.lexical_declaration,
+          $.variable_declaration
+        )),
       ),
 
     //
@@ -287,8 +296,7 @@ module.exports = grammar({
 
     block_initializer: ($) =>
       choice(
-        alias($.lexical_declaration, $.variable_declaration),
-        $.variable_declaration,
+        field('variable_declaration', choice($.lexical_declaration, $.variable_declaration)),
         $.expression_statement
       ),
 
@@ -304,7 +312,6 @@ module.exports = grammar({
         optional_with_placeholder(
           "block_update_optional",
           alias($._expressions, $.block_update)
-          // TODO: Check if this needs to be a visible node, or that this conversion works properly.
         ),
         ")",
         field("body", $.statement)
@@ -319,13 +326,12 @@ module.exports = grammar({
         choice("in", "of"),
         field("block_collection", $._expressions),
         ")",
-        // $._for_header,
         field("body", $.statement)
       ),
 
     block_iterator: ($) =>
       choice(
-        field("left", choice($._lhs_expression, $.parenthesized_expression)),
+        choice($._lhs_expression, $.parenthesized_expression), // left
         seq(
           choice("var", "let", "const"),
           field("left", choice($.identifier, $._destructuring_pattern))
@@ -388,7 +394,7 @@ module.exports = grammar({
     labeled_statement: ($) =>
       prec.dynamic(
         -1,
-        seq(field("label", choice($.identifier, $._reserved_identifier)), ":", $.statement)
+        seq(field("label", choice($.identifier, $.reserved_identifier_)), ":", $.statement)
       ),
 
     //
@@ -439,8 +445,7 @@ module.exports = grammar({
         $.subscript_expression,
         $.member_expression,
         $.parenthesized_expression,
-        $._identifier,
-        alias($._reserved_identifier, $.identifier),
+        $.identifier_or_reserved,
         $.this,
         $.super,
         $.number,
@@ -477,7 +482,7 @@ module.exports = grammar({
                   $.key_value_pair,
                   $.spread_element,
                   $.method_definition,
-                  choice($.identifier, $._reserved_identifier)
+                  choice($.identifier, $.reserved_identifier_)
                 )
               )
             )
@@ -497,7 +502,7 @@ module.exports = grammar({
                 $.pair_pattern,
                 $.rest_pattern,
                 $.object_assignment_pattern,
-                choice($.identifier, $._reserved_identifier)
+                choice($.identifier, $.reserved_identifier_)
               )
             )
           ),
@@ -511,7 +516,7 @@ module.exports = grammar({
       seq(
         field(
           "left",
-          choice(choice($._reserved_identifier, $.identifier), $._destructuring_pattern)
+          choice(choice($.reserved_identifier_, $.identifier), $._destructuring_pattern)
         ),
         "=",
         field("right", $.expression)
@@ -581,7 +586,7 @@ module.exports = grammar({
 
     jsx_identifier: ($) => /[a-zA-Z_$][a-zA-Z\d_$]*-[a-zA-Z\d_$\-]*/,
 
-    _jsx_identifier: ($) => field("identifier", choice($.jsx_identifier, $.identifier)),
+    jsx_identifier_: ($) => field("identifier", choice($.jsx_identifier, $.identifier)),
 
     nested_identifier: ($) =>
       prec(
@@ -589,9 +594,9 @@ module.exports = grammar({
         seq(field("identifier", choice($.identifier, $.nested_identifier)), ".", $.identifier)
       ),
 
-    jsx_namespace_name: ($) => seq($._jsx_identifier, ":", $._jsx_identifier),
+    jsx_namespace_name: ($) => seq($.jsx_identifier_, ":", $.jsx_identifier_),
 
-    _jsx_element_name: ($) => choice($._jsx_identifier, $.nested_identifier, $.jsx_namespace_name),
+    _jsx_element_name: ($) => choice($.jsx_identifier_, $.nested_identifier, $.jsx_namespace_name),
 
     markup_closing_tag: ($) => seq("<", "/", field("identifier", $._jsx_element_name), ">"),
 
@@ -608,7 +613,7 @@ module.exports = grammar({
       choice($.markup_attribute, alias($.jsx_embedded_expression_block, $.enclosed_body)),
 
     _jsx_attribute_name: ($) =>
-      field("markup_attribute_name", choice($._jsx_identifier, $.jsx_namespace_name)),
+      field("markup_attribute_name", choice($.jsx_identifier_, $.jsx_namespace_name)),
 
     markup_attribute: ($) => seq($._jsx_attribute_name, optional(seq("=", $._jsx_attribute_value))),
 
@@ -707,7 +712,7 @@ module.exports = grammar({
       seq(
         optional_with_placeholder("modifier_list", $.async_modifier),
         choice(
-          field("parameter", choice($._reserved_identifier, $.identifier)),
+          field("parameter", choice($.reserved_identifier_, $.identifier)),
           $.lambda_call_signature
         ),
         "=>",
@@ -723,15 +728,14 @@ module.exports = grammar({
     call: ($) =>
       choice(
         prec(
-          "call",
-          seq(
+          "call", seq(
             field("identifier", $.expression),
             field("arguments_", choice($.arguments, $.template_string))
-          )
+          ), 
         ),
         prec(
-          "member",
-          seq(field("identifier", $.primary_expression), "?.", field("arguments_", $.arguments))
+          "member", 
+          seq(field("identifier", $.primary_expression), "?.", field("arguments_", $.arguments)),
         )
       ),
 
@@ -769,12 +773,16 @@ module.exports = grammar({
         )
       ),
 
+      identifier_or_reserved: $ => field('identifier', choice(
+        $._identifier,
+        $.reserved_identifier_,
+      )),
+
     _lhs_expression: ($) =>
       choice(
         $.member_expression,
         $.subscript_expression,
-        $._identifier,
-        alias($._reserved_identifier, $.identifier),
+        $.identifier_or_reserved,
         $._destructuring_pattern
       ),
 
@@ -788,12 +796,14 @@ module.exports = grammar({
         )
       ),
 
-    _augmented_assignment_lhs: ($) =>
+    augmented_assignment_lhs: ($) =>
       choice(
         $.member_expression,
         $.subscript_expression,
-        alias($._reserved_identifier, $.identifier),
-        $.identifier,
+        field('identifier', choice(
+          $.reserved_identifier_, 
+          $.identifier
+        )),
         $.parenthesized_expression
       ),
 
@@ -801,7 +811,7 @@ module.exports = grammar({
       prec.right(
         "assign",
         seq(
-          field("left", $._augmented_assignment_lhs),
+          field("left", $.augmented_assignment_lhs),
           choice(
             "+=",
             "-=",
@@ -1146,7 +1156,7 @@ module.exports = grammar({
         -1,
         choice(
           $.identifier,
-          alias($._reserved_identifier, $.identifier_),
+          alias($.reserved_identifier_, $.identifier_),
           $._destructuring_pattern,
           $.rest_pattern
         )
@@ -1189,7 +1199,7 @@ module.exports = grammar({
         "identifier",
         choice(
           $.identifier,
-          $._reserved_identifier,
+          $.reserved_identifier_,
           $.private_property_identifier,
           $.string,
           $.number,
@@ -1199,7 +1209,7 @@ module.exports = grammar({
 
     computed_property_name: ($) => seq("[", $.expression, "]"),
 
-    _reserved_identifier: ($) => choice("get", "set", "async", "static", "export"),
+    reserved_identifier_: ($) => choice("get", "set", "async", "static", "export"),
 
     _semicolon: ($) => choice($._automatic_semicolon, ";"),
   },
