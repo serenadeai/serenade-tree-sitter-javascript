@@ -10,5 +10,5 @@ for f in ${changed[@]} ; do
     prettier --write "$f" &>/dev/null
     git add "$f"
 done
-''
+
 exit 0
