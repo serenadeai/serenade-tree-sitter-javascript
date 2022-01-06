@@ -13,11 +13,12 @@
     "nan": "^2.12.1"
   },
   "devDependencies": {
-    "tree-sitter-cli": "^0.19.2"
+    "tree-sitter-cli": "^0.19.5"
   },
   "scripts": {
     "test": "tree-sitter test && script/parse-examples",
-    "test-windows": "tree-sitter test"
+    "test-windows": "tree-sitter test",
+    "build": "tree-sitter generate"
   },
   "tree-sitter": [
     {
@@ -32,5 +33,12 @@
       ],
       "injection-regex": "^(js|javascript)$"
     }
-  ]
+  ],
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": false,
+    "arrowParens": "avoid",
+    "singleQuote": true
+  }
 }
