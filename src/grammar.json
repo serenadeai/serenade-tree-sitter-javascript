@@ -1258,17 +1258,21 @@
           "name": "block_iterator"
         },
         {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "STRING",
-              "value": "in"
-            },
-            {
-              "type": "STRING",
-              "value": "of"
-            }
-          ]
+          "type": "FIELD",
+          "name": "for_each_separator",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "in"
+              },
+              {
+                "type": "STRING",
+                "value": "of"
+              }
+            ]
+          }
         },
         {
           "type": "FIELD",

@@ -12,7 +12,7 @@
 #define ALIAS_COUNT 7
 #define TOKEN_COUNT 125
 #define EXTERNAL_TOKEN_COUNT 2
-#define FIELD_COUNT 64
+#define FIELD_COUNT 65
 #define MAX_ALIAS_SEQUENCE_LENGTH 8
 #define PRODUCTION_ID_COUNT 127
 
@@ -1994,43 +1994,44 @@ enum {
   field_else_if_clause_list = 25,
   field_finally_clause_optional = 26,
   field_flags = 27,
-  field_function_ = 28,
-  field_identifier = 29,
-  field_import_specifier_list = 30,
-  field_index = 31,
-  field_jsx_embedded_expression = 32,
-  field_key_value_pair_key = 33,
-  field_key_value_pair_list = 34,
-  field_key_value_pair_value = 35,
-  field_label = 36,
-  field_left = 37,
-  field_list = 38,
-  field_markup_attribute_list = 39,
-  field_markup_attribute_name = 40,
-  field_markup_attribute_value = 41,
-  field_markup_content_list = 42,
-  field_member_ = 43,
-  field_modifier = 44,
-  field_modifier_list = 45,
-  field_name = 46,
-  field_object = 47,
-  field_open_tag = 48,
-  field_operator = 49,
-  field_parameter = 50,
-  field_parameter_list = 51,
-  field_parameter_list_optional = 52,
-  field_parameters = 53,
-  field_pattern = 54,
-  field_property = 55,
-  field_property_ = 56,
-  field_return_value = 57,
-  field_return_value_optional = 58,
-  field_right = 59,
-  field_source = 60,
-  field_statement_list = 61,
-  field_throw = 62,
-  field_value = 63,
-  field_variable_declaration = 64,
+  field_for_each_separator = 28,
+  field_function_ = 29,
+  field_identifier = 30,
+  field_import_specifier_list = 31,
+  field_index = 32,
+  field_jsx_embedded_expression = 33,
+  field_key_value_pair_key = 34,
+  field_key_value_pair_list = 35,
+  field_key_value_pair_value = 36,
+  field_label = 37,
+  field_left = 38,
+  field_list = 39,
+  field_markup_attribute_list = 40,
+  field_markup_attribute_name = 41,
+  field_markup_attribute_value = 42,
+  field_markup_content_list = 43,
+  field_member_ = 44,
+  field_modifier = 45,
+  field_modifier_list = 46,
+  field_name = 47,
+  field_object = 48,
+  field_open_tag = 49,
+  field_operator = 50,
+  field_parameter = 51,
+  field_parameter_list = 52,
+  field_parameter_list_optional = 53,
+  field_parameters = 54,
+  field_pattern = 55,
+  field_property = 56,
+  field_property_ = 57,
+  field_return_value = 58,
+  field_return_value_optional = 59,
+  field_right = 60,
+  field_source = 61,
+  field_statement_list = 62,
+  field_throw = 63,
+  field_value = 64,
+  field_variable_declaration = 65,
 };
 
 static const char * const ts_field_names[] = {
@@ -2062,6 +2063,7 @@ static const char * const ts_field_names[] = {
   [field_else_if_clause_list] = "else_if_clause_list",
   [field_finally_clause_optional] = "finally_clause_optional",
   [field_flags] = "flags",
+  [field_for_each_separator] = "for_each_separator",
   [field_function_] = "function_",
   [field_identifier] = "identifier",
   [field_import_specifier_list] = "import_specifier_list",
@@ -2221,10 +2223,10 @@ static const TSFieldMapSlice ts_field_map_slices[PRODUCTION_ID_COUNT] = {
   [120] = {.index = 220, .length = 6},
   [121] = {.index = 226, .length = 4},
   [122] = {.index = 226, .length = 4},
-  [123] = {.index = 230, .length = 2},
-  [124] = {.index = 232, .length = 2},
-  [125] = {.index = 234, .length = 7},
-  [126] = {.index = 241, .length = 3},
+  [123] = {.index = 230, .length = 3},
+  [124] = {.index = 233, .length = 2},
+  [125] = {.index = 235, .length = 7},
+  [126] = {.index = 242, .length = 4},
 };
 
 static const TSFieldMapEntry ts_field_map_entries[] = {
@@ -2577,10 +2579,11 @@ static const TSFieldMapEntry ts_field_map_entries[] = {
   [230] =
     {field_block_collection, 4},
     {field_body, 6},
-  [232] =
+    {field_for_each_separator, 3},
+  [233] =
     {field_condition, 3},
     {field_consequence, 5},
-  [234] =
+  [235] =
     {field_body, 6},
     {field_decorator_list, 0},
     {field_modifier_list, 1},
@@ -2588,9 +2591,10 @@ static const TSFieldMapEntry ts_field_map_entries[] = {
     {field_modifier_list, 3},
     {field_name, 4},
     {field_parameters, 5},
-  [241] =
+  [242] =
     {field_block_collection, 5},
     {field_body, 7},
+    {field_for_each_separator, 4},
     {field_modifier_list, 1},
 };
 

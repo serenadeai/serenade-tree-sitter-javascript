@@ -1311,6 +1311,20 @@
           }
         ]
       },
+      "for_each_separator": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "in",
+            "named": false
+          },
+          {
+            "type": "of",
+            "named": false
+          }
+        ]
+      },
       "modifier_list": {
         "multiple": false,
         "required": false,

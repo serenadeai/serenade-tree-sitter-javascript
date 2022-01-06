@@ -358,7 +358,7 @@ module.exports = grammar({
         optional_with_placeholder('modifier_list', $.await_modifier),
         '(',
         $.block_iterator,
-        choice('in', 'of'),
+        field('for_each_separator', choice('in', 'of')),
         field('block_collection', $._expressions),
         ')',
         field('body', $.statement)
