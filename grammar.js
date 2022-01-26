@@ -617,7 +617,15 @@ module.exports = grammar({
         field('close_tag', $.markup_closing_tag)
       ),
 
-    jsx_fragment: $ => seq('<', '>', repeat($.jsx_child), '<', '/', '>'),
+    jsx_fragment: $ =>
+      seq(
+        field('markup_opening_tag', seq('<', '>')),
+        optional_with_placeholder(
+          'markup_content_list',
+          repeat(alias($.jsx_child, $.markup_content))
+        ),
+        field('markup_closing_tag', seq('<', '/', '>'))
+      ),
 
     jsx_text: $ => /[^{}<>]+/,
 
@@ -1186,14 +1194,18 @@ module.exports = grammar({
     _identifier: $ => choice($.undefined, $.identifier),
 
     identifier: $ => {
-      const alpha = /[^\x00-\x1F\s0-9:;`"'@#.,|^&<=>+\-*/\\%?!~()\[\]{}\uFEFF\u2060\u200B\u00A0]|\\u[0-9a-fA-F]{4}|\\u\{[0-9a-fA-F]+\}/
-      const alphanumeric = /[^\x00-\x1F\s:;`"'@#.,|^&<=>+\-*/\\%?!~()\[\]{}\uFEFF\u2060\u200B\u00A0]|\\u[0-9a-fA-F]{4}|\\u\{[0-9a-fA-F]+\}/
+      const alpha =
+        /[^\x00-\x1F\s0-9:;`"'@#.,|^&<=>+\-*/\\%?!~()\[\]{}\uFEFF\u2060\u200B\u00A0]|\\u[0-9a-fA-F]{4}|\\u\{[0-9a-fA-F]+\}/
+      const alphanumeric =
+        /[^\x00-\x1F\s:;`"'@#.,|^&<=>+\-*/\\%?!~()\[\]{}\uFEFF\u2060\u200B\u00A0]|\\u[0-9a-fA-F]{4}|\\u\{[0-9a-fA-F]+\}/
       return token(seq(alpha, repeat(alphanumeric)))
     },
 
     private_property_identifier: $ => {
-      const alpha = /[^\x00-\x1F\s0-9:;`"'@#.,|^&<=>+\-*/\\%?!~()\[\]{}\uFEFF\u2060\u200B\u00A0]|\\u[0-9a-fA-F]{4}|\\u\{[0-9a-fA-F]+\}/
-      const alphanumeric = /[^\x00-\x1F\s:;`"'@#.,|^&<=>+\-*/\\%?!~()\[\]{}\uFEFF\u2060\u200B\u00A0]|\\u[0-9a-fA-F]{4}|\\u\{[0-9a-fA-F]+\}/
+      const alpha =
+        /[^\x00-\x1F\s0-9:;`"'@#.,|^&<=>+\-*/\\%?!~()\[\]{}\uFEFF\u2060\u200B\u00A0]|\\u[0-9a-fA-F]{4}|\\u\{[0-9a-fA-F]+\}/
+      const alphanumeric =
+        /[^\x00-\x1F\s:;`"'@#.,|^&<=>+\-*/\\%?!~()\[\]{}\uFEFF\u2060\u200B\u00A0]|\\u[0-9a-fA-F]{4}|\\u\{[0-9a-fA-F]+\}/
       return token(seq('#', alpha, repeat(alphanumeric)))
     },
 

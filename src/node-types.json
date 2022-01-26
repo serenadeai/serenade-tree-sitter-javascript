@@ -1687,49 +1687,51 @@
     "fields": {}
   },
   {
-    "type": "jsx_child",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "enclosed_body",
-          "named": true
-        },
-        {
-          "type": "jsx_fragment",
-          "named": true
-        },
-        {
-          "type": "jsx_text",
-          "named": true
-        },
-        {
-          "type": "markup_element",
-          "named": true
-        },
-        {
-          "type": "markup_singleton_tag",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "jsx_fragment",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "jsx_child",
-          "named": true
-        }
-      ]
+    "fields": {
+      "markup_closing_tag": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "/",
+            "named": false
+          },
+          {
+            "type": "<",
+            "named": false
+          },
+          {
+            "type": ">",
+            "named": false
+          }
+        ]
+      },
+      "markup_content_list": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "markup_content",
+            "named": true
+          }
+        ]
+      },
+      "markup_opening_tag": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "<",
+            "named": false
+          },
+          {
+            "type": ">",
+            "named": false
+          }
+        ]
+      }
     }
   },
   {
