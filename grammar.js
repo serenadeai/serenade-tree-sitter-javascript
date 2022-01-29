@@ -85,9 +85,8 @@ module.exports = grammar({
     [$.rest_pattern, $.identifier_or_reserved],
     [$.property_name, $.identifier_or_reserved],
 
-    [$.object, $.object_pattern, $.identifier_or_reserved],
-
-    // `object`, `object_pattern`, `identifier_or_reserved`
+    [$.object, $.object_pattern_element, $.identifier_or_reserved],
+    [$.object, $.object_pattern_element],
   ],
 
   word: $ => $.identifier,
@@ -556,18 +555,22 @@ module.exports = grammar({
         'object',
         seq(
           '{',
-          commaSep(
-            optional(
-              choice(
-                $.pair_pattern,
-                $.rest_pattern,
-                $.object_assignment_pattern,
-                choice($.identifier, $.reserved_identifier_)
-              )
+          optional_with_placeholder(
+            'object_pattern_list',
+            commaSep(
+              optional(alias($.object_pattern_element, $.pattern_list_element))
             )
           ),
           '}'
         )
+      ),
+
+    object_pattern_element: $ =>
+      choice(
+        $.pair_pattern,
+        $.rest_pattern,
+        $.object_assignment_pattern,
+        choice($.identifier, $.reserved_identifier_)
       ),
 
     assignment_pattern: $ =>
@@ -601,9 +604,16 @@ module.exports = grammar({
     array_pattern: $ =>
       seq(
         '[',
-        commaSep(optional(choice($.pattern, $.assignment_pattern))),
+        optional_with_placeholder(
+          'array_pattern_list',
+          commaSep(
+            optional(alias($.array_pattern_element, $.pattern_list_element))
+          )
+        ),
         ']'
       ),
+
+    array_pattern_element: $ => choice($.pattern, $.assignment_pattern),
 
     _jsx_element: $ => choice($.markup_element, $.markup_singleton_tag),
 
@@ -1005,7 +1015,7 @@ module.exports = grammar({
         ].map(([operator, precedence]) =>
           prec.left(
             precedence,
-            seq(field('operator', operator), field('argument', $.expression))
+            seq(field('operator', operator), field('argument_', $.expression))
           )
         )
       ),
@@ -1014,12 +1024,12 @@ module.exports = grammar({
       prec.left(
         choice(
           seq(
-            field('argument', $.expression),
+            field('argument_', $.expression),
             field('operator', choice('++', '--'))
           ),
           seq(
             field('operator', choice('++', '--')),
-            field('argument', $.expression)
+            field('argument_', $.expression)
           )
         )
       ),

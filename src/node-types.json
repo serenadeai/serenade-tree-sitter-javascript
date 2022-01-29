@@ -85,20 +85,21 @@
   {
     "type": "array_pattern",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "assignment_pattern",
-          "named": true
-        },
-        {
-          "type": "pattern",
-          "named": true
-        }
-      ]
+    "fields": {
+      "array_pattern_list": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": ",",
+            "named": false
+          },
+          {
+            "type": "pattern_list_element",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -2462,32 +2463,21 @@
   {
     "type": "object_pattern",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "object_assignment_pattern",
-          "named": true
-        },
-        {
-          "type": "pair_pattern",
-          "named": true
-        },
-        {
-          "type": "reserved_identifier_",
-          "named": true
-        },
-        {
-          "type": "rest_pattern",
-          "named": true
-        }
-      ]
+    "fields": {
+      "object_pattern_list": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": ",",
+            "named": false
+          },
+          {
+            "type": "pattern_list_element",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -2591,6 +2581,45 @@
         },
         {
           "type": "object_pattern",
+          "named": true
+        },
+        {
+          "type": "rest_pattern",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "pattern_list_element",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "assignment_pattern",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "object_assignment_pattern",
+          "named": true
+        },
+        {
+          "type": "pair_pattern",
+          "named": true
+        },
+        {
+          "type": "pattern",
+          "named": true
+        },
+        {
+          "type": "reserved_identifier_",
           "named": true
         },
         {
@@ -3280,7 +3309,7 @@
     "type": "unary_expression",
     "named": true,
     "fields": {
-      "argument": {
+      "argument_": {
         "multiple": false,
         "required": true,
         "types": [
@@ -3330,7 +3359,7 @@
     "type": "update_expression",
     "named": true,
     "fields": {
-      "argument": {
+      "argument_": {
         "multiple": false,
         "required": true,
         "types": [
