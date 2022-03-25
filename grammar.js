@@ -540,16 +540,6 @@ module.exports = grammar({
               prec.dynamic(2, $.key_value_pair_list),
               $.object_pattern_list
             )
-            // commaSep(
-            //   optional(
-            //     choice(
-            //       $.key_value_pair,
-            //       $.spread_element,
-            //       $.method_definition,
-            //       choice($.identifier, $.reserved_identifier_)
-            //     )
-            //   )
-            // )
           ),
           '}'
         )
