@@ -992,6 +992,68 @@
     }
   },
   {
+    "type": "export_declaration",
+    "named": true,
+    "fields": {
+      "declaration": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "declaration",
+            "named": true
+          }
+        ]
+      },
+      "decorator_list": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "decorator",
+            "named": true
+          }
+        ]
+      },
+      "modifier_list": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "export_modifier",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "export_modifier",
+    "named": true,
+    "fields": {
+      "modifier": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "export",
+            "named": false
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "export_specifier",
     "named": true,
     "fields": {
@@ -1021,42 +1083,12 @@
     "type": "export_statement",
     "named": true,
     "fields": {
-      "declaration": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "declaration",
-            "named": true
-          }
-        ]
-      },
-      "decorator_list": {
-        "multiple": true,
-        "required": false,
-        "types": [
-          {
-            "type": "decorator",
-            "named": true
-          }
-        ]
-      },
       "source": {
         "multiple": false,
         "required": false,
         "types": [
           {
             "type": "string",
-            "named": true
-          }
-        ]
-      },
-      "value": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "expression",
             "named": true
           }
         ]
@@ -1068,6 +1100,10 @@
       "types": [
         {
           "type": "export_clause",
+          "named": true
+        },
+        {
+          "type": "export_declaration",
           "named": true
         },
         {
