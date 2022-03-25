@@ -1797,6 +1797,21 @@
     }
   },
   {
+    "type": "key_value_pair_list",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "key_value_pair",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "labeled_statement",
     "named": true,
     "fields": {
@@ -2391,31 +2406,15 @@
     "named": true,
     "fields": {
       "key_value_pair_list": {
-        "multiple": true,
+        "multiple": false,
         "required": false,
         "types": [
           {
-            "type": ",",
-            "named": false
-          },
-          {
-            "type": "identifier",
+            "type": "key_value_pair_list",
             "named": true
           },
           {
-            "type": "key_value_pair",
-            "named": true
-          },
-          {
-            "type": "method_definition",
-            "named": true
-          },
-          {
-            "type": "reserved_identifier_",
-            "named": true
-          },
-          {
-            "type": "spread_element",
+            "type": "object_pattern_list",
             "named": true
           }
         ]
@@ -2474,6 +2473,38 @@
           },
           {
             "type": "pattern_list_element",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "object_pattern_list",
+    "named": true,
+    "fields": {
+      "pattern_list_element": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "key_value_pair",
+            "named": true
+          },
+          {
+            "type": "method_definition",
+            "named": true
+          },
+          {
+            "type": "reserved_identifier_",
+            "named": true
+          },
+          {
+            "type": "spread_element",
             "named": true
           }
         ]
