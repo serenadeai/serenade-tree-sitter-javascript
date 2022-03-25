@@ -85,8 +85,9 @@ module.exports = grammar({
     [$.rest_pattern, $.identifier_or_reserved],
     [$.property_name, $.identifier_or_reserved],
 
-    [$.object, $.object_pattern_element, $.identifier_or_reserved],
-    [$.object, $.object_pattern_element],
+    [$.object_pattern_list, $.object_pattern_element, $.identifier_or_reserved],
+    [$.object_pattern_list, $.object_pattern_element],
+    [$.object_pattern_list, $.key_value_pair_list],
   ],
 
   word: $ => $.identifier,
@@ -535,19 +536,31 @@ module.exports = grammar({
           '{',
           optional_with_placeholder(
             'key_value_pair_list',
-            commaSep(
-              optional(
-                choice(
-                  $.key_value_pair,
-                  $.spread_element,
-                  $.method_definition,
-                  choice($.identifier, $.reserved_identifier_)
-                )
-              )
+            choice(
+              prec.dynamic(2, $.key_value_pair_list),
+              $.object_pattern_list
             )
           ),
           '}'
         )
+      ),
+
+    key_value_pair_list: $ => seq(commaSep1($.key_value_pair), optional(',')),
+
+    object_pattern_list: $ =>
+      seq(
+        commaSep1(
+          field(
+            'pattern_list_element',
+            choice(
+              $.key_value_pair,
+              $.spread_element,
+              $.method_definition,
+              choice($.identifier, $.reserved_identifier_)
+            )
+          )
+        ),
+        optional(',')
       ),
 
     object_pattern: $ =>
