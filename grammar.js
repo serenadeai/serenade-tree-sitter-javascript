@@ -106,6 +106,7 @@ module.exports = grammar({
     // Modifiers
     async_modifier: $ => field('modifier', 'async'),
     await_modifier: $ => field('modifier', 'await'),
+    default_modifier: $ => field('modifier', 'default'),
     export_modifier: $ => field('modifier', 'export'),
     static_modifier: $ => field('modifier', 'static'),
     accessors_modifier: $ => field('modifier', choice('get', 'set', '*')),
@@ -125,7 +126,8 @@ module.exports = grammar({
             seq($.export_clause, $._semicolon)
           )
         ),
-        $.export_declaration
+        $.export_declaration,
+        $.export_field_declaration
       ),
 
     export_clause: $ =>
@@ -139,17 +141,18 @@ module.exports = grammar({
     export_declaration: $ =>
       seq(
         optional_with_placeholder('decorator_list', repeat($.decorator)),
-        field('modifier_list', $.export_modifier),
-        choice(
-          field('declaration', $.declaration),
-          seq(
-            'default',
-            choice(
-              field('declaration', $.declaration),
-              seq(field('value', $.expression), $._semicolon)
-            )
-          )
-        )
+        field(
+          'modifier_list',
+          seq($.export_modifier, optional($.default_modifier))
+        ),
+        field('declaration', $.declaration)
+      ),
+
+    export_field_declaration: $ =>
+      seq(
+        optional_with_placeholder('decorator_list', repeat($.decorator)),
+        field('modifier_list', seq($.export_modifier, $.default_modifier)),
+        seq(field('value', $.expression), $._semicolon)
       ),
 
     _import_export_specifier: $ =>
