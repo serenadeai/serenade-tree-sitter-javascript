@@ -44,7 +44,12 @@ module.exports = grammar({
     ['assign', $.primary_expression],
     ['member', 'new', 'call', $.expression],
     ['declaration', 'literal'],
-    [$.primary_expression, $.enclosed_body, 'object'],
+    [
+      $.primary_expression,
+      $.enclosed_body,
+      'object',
+      $.key_value_pair_list_block,
+    ],
     [$.import, $.import_token],
     [$.export_statement, $.primary_expression],
   ],
@@ -539,20 +544,22 @@ module.exports = grammar({
     object: $ =>
       prec(
         'object',
-        seq(
-          '{',
-          optional_with_placeholder(
-            'key_value_pair_list',
-            choice(
-              prec.dynamic(2, $.key_value_pair_list),
-              $.object_pattern_list
-            )
-          ),
-          '}'
+        choice(
+          prec.dynamic(2, $.key_value_pair_list_block),
+          $.object_pattern_list_block
         )
       ),
 
+    key_value_pair_list_block: $ =>
+      seq(
+        '{',
+        optional_with_placeholder('key_value_pair_list', $.key_value_pair_list),
+        '}'
+      ),
+
     key_value_pair_list: $ => seq(commaSep1($.key_value_pair), optional(',')),
+
+    object_pattern_list_block: $ => seq('{', $.object_pattern_list, '}'),
 
     object_pattern_list: $ =>
       seq(
